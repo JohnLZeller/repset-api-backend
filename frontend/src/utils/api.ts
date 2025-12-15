@@ -34,6 +34,15 @@ export interface ErrorResponse {
   [key: string]: string | string[] | undefined
 }
 
+export interface TrainingPreferences {
+  excluded_equipment: string[]
+  excluded_exercise_attributes: string[]
+  sessions_per_week: number
+  training_intensity: number
+  session_time_limit: number
+  updated_at: string
+}
+
 async function getCsrfToken(): Promise<string> {
   const response = await fetch(`${API_BASE_URL}/auth/csrf/`)
   if (!response.ok) {
@@ -101,4 +110,18 @@ export const api = {
       method: 'POST',
     })
   },
+
+  async getTrainingPreferences(): Promise<TrainingPreferences> {
+    return apiRequest<TrainingPreferences>('/preferences/training/')
+  },
+
+  async updateTrainingPreferences(
+    data: Partial<TrainingPreferences>
+  ): Promise<TrainingPreferences> {
+    return apiRequest<TrainingPreferences>('/preferences/training/', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    })
+  },
 }
+

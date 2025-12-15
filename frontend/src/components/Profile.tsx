@@ -1,9 +1,10 @@
 import { useAuth } from '../contexts/AuthContext'
 import { Button } from '@/components/ui/button'
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
-import { Dumbbell, LogOut, User, Mail, Calendar, Shield, Settings } from 'lucide-react'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
+import { Dumbbell, LogOut, User, Mail, Calendar, Shield } from 'lucide-react'
+import TrainingPreferenceEditor from './TrainingPreferenceEditor'
 
-export default function Home() {
+export default function Profile() {
   const { user, logout } = useAuth()
 
   const handleLogout = async () => {
@@ -22,10 +23,7 @@ export default function Home() {
             </div>
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="sm" asChild>
-                <a href="/profile" className="gap-2">
-                  <Settings className="w-4 h-4" />
-                  Profile
-                </a>
+                <a href="/">Home</a>
               </Button>
               <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-2">
                 <LogOut className="w-4 h-4" />
@@ -39,15 +37,13 @@ export default function Home() {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-foreground">
-            Welcome back, {user?.first_name || user?.full_name || user?.email}!
-          </h2>
-          <p className="text-muted-foreground mt-1">Here's your account overview</p>
+          <h2 className="text-3xl font-bold text-foreground">Profile Settings</h2>
+          <p className="text-muted-foreground mt-1">Manage your account and preferences</p>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {/* User Profile Card */}
-          <Card className="md:col-span-2 lg:col-span-2">
+          <Card className="md:col-span-2 lg:col-span-1">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <User className="w-5 h-5" />
@@ -62,7 +58,7 @@ export default function Home() {
                   <p className="font-medium text-foreground">{user?.email}</p>
                 </div>
               </div>
-              
+
               {user?.full_name && (
                 <>
                   <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
@@ -88,7 +84,7 @@ export default function Home() {
                   </div>
                 </>
               )}
-              
+
               <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                 <Calendar className="w-5 h-5 text-muted-foreground" />
                 <div>
@@ -98,7 +94,7 @@ export default function Home() {
                   </p>
                 </div>
               </div>
-              
+
               {user?.is_staff && (
                 <div className="flex items-center gap-2 mt-4">
                   <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium">
@@ -110,23 +106,10 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          {/* Quick Actions Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <p className="text-sm text-muted-foreground">
-                More features coming soon!
-              </p>
-            </CardContent>
-            <CardFooter>
-              <Button variant="destructive" className="w-full gap-2" onClick={handleLogout}>
-                <LogOut className="w-4 h-4" />
-                Logout
-              </Button>
-            </CardFooter>
-          </Card>
+          {/* Training Preferences */}
+          <div className="md:col-span-2 lg:col-span-2">
+            <TrainingPreferenceEditor />
+          </div>
         </div>
       </main>
     </div>

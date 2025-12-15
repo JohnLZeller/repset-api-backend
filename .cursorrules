@@ -1,0 +1,22 @@
+# Project Context and Reminders
+
+## Docker Environment
+**IMPORTANT: This project runs using Docker Compose.**
+- All commands should be run inside Docker containers using `docker compose exec <service> <command>`
+- Backend commands: Use `docker compose exec backend python manage.py <command>`
+- Frontend commands: Use `docker compose exec frontend npm <command>`
+- Never assume commands run directly on the host - always use Docker
+- Services are defined in `docker-compose.yml` at the project root
+
+## Project Structure
+- Backend: Django REST Framework in `/backend` directory
+- Frontend: React + Vite + TypeScript in `/frontend` directory
+- Both services are containerized and run via Docker Compose
+
+## Common Docker Commands
+- Start services: `docker compose up` or `docker compose up -d`
+- Stop services: `docker compose down`
+- View logs: `docker compose logs -f <service>`
+- Rebuild: `docker compose build` or `docker compose up --build`
+- Execute commands: `docker compose exec <service> <command>`
+

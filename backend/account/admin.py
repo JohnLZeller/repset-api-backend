@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from .models import User
+from .models import User, UserTrainingPreferences
 
 
 @admin.register(User)
@@ -31,7 +31,10 @@ class UserAdmin(BaseUserAdmin):
 
     fieldsets = (
         (None, {"fields": ("email", "password")}),
-        ("Personal info", {"fields": ("full_name", "first_name", "last_name")}),
+        (
+            "Personal info",
+            {"fields": ("full_name", "first_name", "last_name")},
+        ),
         (
             "Permissions",
             {
@@ -68,3 +71,20 @@ class UserAdmin(BaseUserAdmin):
     )
 
     filter_horizontal = ["groups", "user_permissions"]
+
+
+@admin.register(UserTrainingPreferences)
+class UserTrainingPreferencesAdmin(admin.ModelAdmin):
+    """Admin interface for UserTrainingPreferences model."""
+
+    list_display = [
+        "user",
+        "sessions_per_week",
+        "training_intensity",
+        "session_time_limit",
+        "updated_at",
+    ]
+    list_filter = ["sessions_per_week", "training_intensity", "updated_at"]
+    search_fields = ["user__email", "user__full_name"]
+    readonly_fields = ["updated_at"]
+    raw_id_fields = ["user"]

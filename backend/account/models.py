@@ -7,8 +7,11 @@ from django.contrib.auth.models import (
     BaseUserManager,
     PermissionsMixin,
 )
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils import timezone
+
+from account.enums import EquipmentType, ExerciseAttribute
 
 if TYPE_CHECKING:
     from django.db.models.manager import Manager
@@ -88,3 +91,38 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self) -> str:
         return f"User #{self.id}: {self.email}"
+
+
+class UserTrainingPreferences(models.Model):
+    """Training preferences for a user, using a blacklist model."""
+
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name="training_preferences",
+    )
+
+    excluded_equipment = ArrayField(
+        models.CharField(max_length=50, choices=EquipmentType.choices),
+        default=list,
+        blank=True,
+    )
+
+    excluded_exercise_attributes = ArrayField(
+        models.CharField(max_length=50, choices=ExerciseAttribute.choices),
+        default=list,
+        blank=True,
+    )
+
+    sessions_per_week = models.SmallIntegerField(default=3)
+    training_intensity = models.PositiveSmallIntegerField(default=5)
+    session_time_limit = models.IntegerField(default=60)  # minutes
+
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "User Training Preferences"
+        verbose_name_plural = "User Training Preferences"
+
+    def __str__(self) -> str:
+        return f"Training Preferences for {self.user.email}"
