@@ -15,17 +15,11 @@ export default function NotificationSettings() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-semibold text-center">Notification Settings</h2>
-      
-      <SettingsCard title="Notifications">
+      <SettingsCard>
         <div className="space-y-0">
           <div className="flex items-center justify-between py-4">
             <div className="flex-1">
-              <div className="font-bold mb-2">Transactional emails</div>
-              <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
-                <li>Password reset</li>
-                <li>Login confirmation</li>
-              </ul>
+              <div className="font-bold mb-2">Transactional emails (password resets, email confirmations, etc.)</div>
             </div>
             <SettingsToggle checked={true} onCheckedChange={() => {}} disabled />
           </div>

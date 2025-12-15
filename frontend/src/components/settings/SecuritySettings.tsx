@@ -122,14 +122,7 @@ export default function SecuritySettings() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-semibold text-center">Security Settings</h2>
-
-      <SettingsCard title="Change Password">
-        <p className="text-sm text-muted-foreground mb-6">
-          Update your password to keep your account secure. Your new password must be at least 8
-          characters and different from your current password.
-        </p>
-
+      <SettingsCard>
         <form onSubmit={handleSubmit}>
           <div className="space-y-6">
             {/* Success message */}

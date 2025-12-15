@@ -108,9 +108,7 @@ export default function AccountSettings() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-semibold text-center">Account Settings</h2>
-
-      <SettingsCard title="Profile Information">
+      <SettingsCard>
         <form onSubmit={handleSubmit}>
           <div className="space-y-6">
             {/* Success message */}

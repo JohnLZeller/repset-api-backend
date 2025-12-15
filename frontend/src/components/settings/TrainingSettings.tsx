@@ -42,7 +42,6 @@ export default function TrainingSettings() {
   if (loading || !preferences) {
     return (
       <div className="space-y-6">
-        <h2 className="text-2xl font-semibold text-center">Training Settings</h2>
         <SettingsCard>
           <div className="text-center py-8">Loading...</div>
         </SettingsCard>
@@ -52,9 +51,7 @@ export default function TrainingSettings() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-semibold text-center">Training Settings</h2>
-      
-      <SettingsCard title="Training Preferences">
+      <SettingsCard>
         <div className="space-y-0">
           <SettingsRow
             label="Excluded Equipment Modalities"
