@@ -1,13 +1,29 @@
-from django.db import models
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
     PermissionsMixin,
 )
+from django.db import models
+from django.utils import timezone
+
+if TYPE_CHECKING:
+    from django.db.models.manager import Manager
 
 
-class UserManager(BaseUserManager):
-    def create_user(self, email, password=None, **extra_fields):
+class UserManager(BaseUserManager["User"]):
+    """Custom user manager that uses email as the unique identifier."""
+
+    def create_user(
+        self,
+        email: str,
+        password: str | None = None,
+        **extra_fields,
+    ) -> User:
+        """Create and save a regular user with the given email and password."""
         if not email:
             raise ValueError("The Email field must be set")
         email = self.normalize_email(email)
@@ -16,7 +32,13 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password=None, **extra_fields):
+    def create_superuser(
+        self,
+        email: str,
+        password: str | None = None,
+        **extra_fields,
+    ) -> User:
+        """Create and save a superuser with the given email and password."""
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
 
@@ -29,15 +51,24 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    """Custom user model that uses email as the unique identifier."""
+
     email = models.EmailField(unique=True)
+    full_name = models.CharField(max_length=255, blank=True)
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
-    objects = UserManager()
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    objects: Manager[User] = UserManager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS: list[str] = []
 
-    def __str__(self):
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
         return f"User #{self.id}: {self.email}"
