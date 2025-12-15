@@ -55,6 +55,11 @@ export interface ChangePasswordResponse {
   detail: string
 }
 
+export interface UpdateProfileData {
+  email: string
+  full_name: string
+}
+
 async function getCsrfToken(): Promise<string> {
   const response = await fetch(`${API_BASE_URL}/auth/csrf/`)
   if (!response.ok) {
@@ -139,6 +144,13 @@ export const api = {
   async changePassword(data: ChangePasswordData): Promise<ChangePasswordResponse> {
     return apiRequest<ChangePasswordResponse>('/auth/password/change/', {
       method: 'POST',
+      body: JSON.stringify(data),
+    })
+  },
+
+  async updateProfile(data: UpdateProfileData): Promise<User> {
+    return apiRequest<User>('/profile/', {
+      method: 'PUT',
       body: JSON.stringify(data),
     })
   },

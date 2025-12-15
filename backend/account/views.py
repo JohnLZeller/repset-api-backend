@@ -15,6 +15,7 @@ from account.serializers import (
     ChangePasswordSerializer,
     LoginSerializer,
     RegisterSerializer,
+    UpdateProfileSerializer,
     UserSerializer,
 )
 
@@ -264,26 +265,29 @@ class CurrentUserView(APIView):
 class ProfileView(APIView):
     """
     GET /api/profile/
+    PUT /api/profile/
 
-    Example protected endpoint that returns the user's profile.
-    Demonstrates how to create authenticated endpoints.
+    Get or update the authenticated user's profile information.
     """
 
     permission_classes = [IsAuthenticated]
 
     def get(self, request: Request) -> Response:
+        """Return the current user's profile information."""
         user = request.user
-        return Response(
-            {
-                "id": user.id,
-                "email": user.email,
-                "full_name": user.full_name,
-                "is_staff": user.is_staff,
-                "created_at": user.created_at.isoformat(),
-                "updated_at": user.updated_at.isoformat(),
-            },
-            status=status.HTTP_200_OK,
-        )
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request: Request) -> Response:
+        """Update the current user's profile information (email and full_name)."""
+        user = request.user
+        serializer = UpdateProfileSerializer(user, data=request.data, partial=False)
+        serializer.is_valid(raise_exception=True)
+        updated_user = serializer.save()
+
+        # Return updated user data using UserSerializer for consistency
+        response_serializer = UserSerializer(updated_user)
+        return Response(response_serializer.data, status=status.HTTP_200_OK)
 
 
 class CSRFTokenView(APIView):

@@ -376,3 +376,108 @@ class CSRFTests(AuthAPITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("csrftoken", response.cookies)
+
+
+class ProfileUpdateTests(AuthAPITestCase):
+    """Tests for the profile update endpoint."""
+
+    def test_update_profile_success(self) -> None:
+        """Test successful profile update with valid data."""
+        user = self.create_test_user()
+
+        # Login first
+        login_data = {
+            "email": self.test_email,
+            "password": self.test_password,
+        }
+        login_response = self.client.post(self.login_url, login_data, format="json")
+
+        # Set access cookie
+        self.client.cookies[settings.JWT_ACCESS_COOKIE_NAME] = login_response.cookies[
+            settings.JWT_ACCESS_COOKIE_NAME
+        ].value
+
+        # Update profile
+        update_data = {
+            "email": "newemail@example.com",
+            "full_name": "Updated Name",
+        }
+        response = self.client.put(self.profile_url, update_data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["email"], "newemail@example.com")
+        self.assertEqual(response.data["full_name"], "Updated Name")
+
+        # Verify user was updated in database
+        user.refresh_from_db()
+        self.assertEqual(user.email, "newemail@example.com")
+        self.assertEqual(user.full_name, "Updated Name")
+
+    def test_update_profile_duplicate_email(self) -> None:
+        """Test profile update fails with duplicate email."""
+        self.create_test_user()
+
+        # Create another user
+        other_user = User.objects.create_user(
+            email="other@example.com",
+            password="Password123!",
+        )
+
+        # Login first
+        login_data = {
+            "email": self.test_email,
+            "password": self.test_password,
+        }
+        login_response = self.client.post(self.login_url, login_data, format="json")
+
+        # Set access cookie
+        self.client.cookies[settings.JWT_ACCESS_COOKIE_NAME] = login_response.cookies[
+            settings.JWT_ACCESS_COOKIE_NAME
+        ].value
+
+        # Try to update to duplicate email
+        update_data = {
+            "email": other_user.email,
+            "full_name": self.test_full_name,
+        }
+        response = self.client.put(self.profile_url, update_data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("email", response.data)
+
+    def test_update_profile_unauthenticated(self) -> None:
+        """Test profile update fails for unauthenticated users."""
+        update_data = {
+            "email": "newemail@example.com",
+            "full_name": "Updated Name",
+        }
+        response = self.client.put(self.profile_url, update_data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_update_profile_same_email(self) -> None:
+        """Test profile update succeeds when email hasn't changed."""
+        self.create_test_user()
+
+        # Login first
+        login_data = {
+            "email": self.test_email,
+            "password": self.test_password,
+        }
+        login_response = self.client.post(self.login_url, login_data, format="json")
+
+        # Set access cookie
+        self.client.cookies[settings.JWT_ACCESS_COOKIE_NAME] = login_response.cookies[
+            settings.JWT_ACCESS_COOKIE_NAME
+        ].value
+
+        # Update only full_name, keep same email
+        update_data = {
+            "email": self.test_email,
+            "full_name": "Updated Name",
+        }
+        response = self.client.put(self.profile_url, update_data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["email"], self.test_email)
+        self.assertEqual(response.data["full_name"], "Updated Name")

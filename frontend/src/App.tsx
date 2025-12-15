@@ -4,6 +4,7 @@ import Login from './components/Login'
 import Register from './components/Register'
 import Home from './components/Home'
 import Settings from './components/settings/Settings'
+import WorkoutDetail from './components/workout/WorkoutDetail'
 import ProtectedRoute from './components/ProtectedRoute'
 import { Dumbbell } from 'lucide-react'
 
@@ -46,6 +47,14 @@ function App() {
         element={
           <ProtectedRoute>
             <Settings />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/workout/:id"
+        element={
+          <ProtectedRoute>
+            <WorkoutDetail />
           </ProtectedRoute>
         }
       />

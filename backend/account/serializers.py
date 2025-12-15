@@ -170,3 +170,45 @@ class ChangePasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError({"new_password": list(e.messages)})
 
         return attrs
+
+
+class UpdateProfileSerializer(serializers.ModelSerializer):
+    """
+    Serializer for updating user profile information (email and full_name).
+
+    Validates that:
+    - Email is unique (case-insensitive) if changed
+    - Email format is valid
+    - Full name is within length limits
+    """
+
+    class Meta:
+        model = User
+        fields = ["email", "full_name"]
+        extra_kwargs = {
+            "email": {"required": True},
+            "full_name": {"required": False, "allow_blank": True},
+        }
+
+    def validate_email(self, value: str) -> str:
+        """Ensure email is unique (case-insensitive) if changed."""
+        email = value.lower()
+        user = self.instance
+
+        # Check if email is being changed
+        if user and user.email.lower() == email:
+            # Email hasn't changed, no need to check uniqueness
+            return email
+
+        # Email is being changed, check if new email already exists
+        if User.objects.filter(email__iexact=email).exists():
+            raise serializers.ValidationError("A user with this email already exists.")
+
+        return email
+
+    def update(self, instance: User, validated_data: dict[str, Any]) -> User:
+        """Update the user instance with validated data."""
+        instance.email = validated_data.get("email", instance.email)
+        instance.full_name = validated_data.get("full_name", instance.full_name)
+        instance.save()
+        return instance
