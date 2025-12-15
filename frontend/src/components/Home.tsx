@@ -16,9 +16,9 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-[hsl(47,100%,58%)]">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white border-b border-[hsl(47,20%,48%)]">
+      <header className="bg-[hsl(47,100%,58%)] border-b border-[hsl(47,20%,48%)]">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer">

@@ -10,8 +10,8 @@
 
 @layer base {
   :root {
-    /* Vibrant golden yellow base - matches ColorControls default */
-    --background: 47 100% 58%;
+    /* White background - swapped from yellow */
+    --background: 0 0% 100%;
     --foreground: 220 15% 18%;
 
     /* White cards for contrast */

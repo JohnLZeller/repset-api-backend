@@ -59,9 +59,9 @@ const WorkoutDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[hsl(47,100%,58%)]">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white border-b border-[hsl(47,20%,48%)] sticky top-0 z-10">
+      <div className="bg-[hsl(47,100%,58%)] border-b border-[hsl(47,20%,48%)] sticky top-0 z-10">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center gap-3">
             <button
@@ -121,7 +121,7 @@ const WorkoutDetail = () => {
 
       {/* Finish Workout Button */}
       {isEditable && (
-        <div className="sticky bottom-0 px-4 pb-8 pt-4 bg-gradient-to-t from-[hsl(47,100%,58%)] via-[hsl(47,100%,58%)] to-transparent">
+        <div className="sticky bottom-0 px-4 pb-8 pt-4 bg-gradient-to-t from-background via-background to-transparent">
           <Button
             onClick={handleFinishWorkout}
             size="lg"

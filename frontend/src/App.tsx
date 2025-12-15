@@ -13,7 +13,7 @@ function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-hero-gradient-start to-hero-gradient-end">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
           <div className="p-4 bg-primary rounded-full animate-pulse-soft">
             <Dumbbell className="w-10 h-10 text-primary-foreground" strokeWidth={2.5} />

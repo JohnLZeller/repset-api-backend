@@ -57,7 +57,7 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-hero-gradient-start to-hero-gradient-end">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-2">
           <div className="flex justify-center mb-2">
@@ -148,3 +148,4 @@ export default function Register() {
     </div>
   )
 }
+
