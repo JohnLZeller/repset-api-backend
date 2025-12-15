@@ -45,6 +45,16 @@ export interface TrainingPreferences {
   updated_at: string
 }
 
+export interface ChangePasswordData {
+  current_password: string
+  new_password: string
+  new_password_confirm: string
+}
+
+export interface ChangePasswordResponse {
+  detail: string
+}
+
 async function getCsrfToken(): Promise<string> {
   const response = await fetch(`${API_BASE_URL}/auth/csrf/`)
   if (!response.ok) {
@@ -122,6 +132,13 @@ export const api = {
   ): Promise<TrainingPreferences> {
     return apiRequest<TrainingPreferences>('/preferences/training/', {
       method: 'PUT',
+      body: JSON.stringify(data),
+    })
+  },
+
+  async changePassword(data: ChangePasswordData): Promise<ChangePasswordResponse> {
+    return apiRequest<ChangePasswordResponse>('/auth/password/change/', {
+      method: 'POST',
       body: JSON.stringify(data),
     })
   },

@@ -109,3 +109,64 @@ class LoginSerializer(serializers.Serializer):
 
         attrs["user"] = user
         return attrs
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    """
+    Serializer for changing user password.
+
+    Validates that:
+    - Current password is correct
+    - New password meets Django's password validation requirements
+    - New password and confirmation match
+    - New password differs from current password
+    """
+
+    current_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(write_only=True, min_length=8)
+    new_password_confirm = serializers.CharField(write_only=True)
+
+    def validate_current_password(self, value: str) -> str:
+        """Verify that current_password matches the authenticated user's password."""
+        user = self.context.get("user")
+        if user is None:
+            raise serializers.ValidationError("User not found in context.")
+
+        if not user.check_password(value):
+            raise serializers.ValidationError("Current password is incorrect.")
+
+        return value
+
+    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
+        """
+        Validate new password confirmation and strength.
+
+        - Ensure new_password and new_password_confirm match
+        - Ensure new_password is not the same as current_password
+        - Run Django password validators against new_password
+        """
+        current_password = attrs.get("current_password")
+        new_password = attrs.get("new_password")
+        new_password_confirm = attrs.get("new_password_confirm")
+        user = self.context.get("user")
+
+        # Check that new password and confirmation match
+        if new_password != new_password_confirm:
+            raise serializers.ValidationError(
+                {"new_password_confirm": "Passwords do not match."}
+            )
+
+        # Ensure new password differs from current password
+        if current_password == new_password:
+            raise serializers.ValidationError(
+                {"new_password": "New password cannot be the same as current password."}
+            )
+
+        # Validate password strength using Django's built-in validators
+        # Pass user instance for similarity checks (e.g., email similarity)
+        try:
+            password_validation.validate_password(new_password, user=user)
+        except DjangoValidationError as e:
+            raise serializers.ValidationError({"new_password": list(e.messages)})
+
+        return attrs

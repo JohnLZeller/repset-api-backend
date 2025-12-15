@@ -12,6 +12,7 @@ from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from account.serializers import (
+    ChangePasswordSerializer,
     LoginSerializer,
     RegisterSerializer,
     UserSerializer,
@@ -303,3 +304,59 @@ class CSRFTokenView(APIView):
             {"csrfToken": csrf_token},
             status=status.HTTP_200_OK,
         )
+
+
+class ChangePasswordView(APIView):
+    """
+    POST /api/auth/password/change/
+
+    Change the authenticated user's password.
+
+    Security considerations:
+    - Requires authentication (IsAuthenticated permission)
+    - Validates current password before allowing change
+    - Enforces Django password validation rules
+    - Issues new JWT tokens after password change to rotate credentials
+    - Blacklists the old refresh token for security
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request: Request) -> Response:
+        user = request.user
+
+        # Validate the password change request
+        serializer = ChangePasswordSerializer(
+            data=request.data,
+            context={"user": user},
+        )
+        serializer.is_valid(raise_exception=True)
+
+        # Update the user's password
+        new_password = serializer.validated_data["new_password"]
+        user.set_password(new_password)
+        user.save()
+
+        # Blacklist the current refresh token for security
+        # This ensures old tokens cannot be used after password change
+        old_refresh_token = request.COOKIES.get(settings.JWT_REFRESH_COOKIE_NAME)
+        if old_refresh_token:
+            try:
+                old_token = RefreshToken(old_refresh_token)
+                old_token.blacklist()
+            except (InvalidToken, TokenError):
+                # Token already invalid or blacklisted - that's fine
+                pass
+
+        # Issue new JWT tokens after password change
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+        refresh_token = str(refresh)
+
+        response = Response(
+            {"detail": "Password changed successfully."},
+            status=status.HTTP_200_OK,
+        )
+
+        # Set new JWT cookies
+        return set_jwt_cookies(response, access_token, refresh_token)
