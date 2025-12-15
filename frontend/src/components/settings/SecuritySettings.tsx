@@ -4,6 +4,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { api, ErrorResponse } from '@/utils/api';
+import { Loader2, Check } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface FieldErrors {
   current_password?: string[];
@@ -18,6 +20,7 @@ export default function SecuritySettings() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [buttonSuccess, setButtonSuccess] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [generalError, setGeneralError] = useState<string | null>(null);
 
@@ -75,6 +78,12 @@ export default function SecuritySettings() {
       // Success - clear form and show success message
       clearForm();
       setSuccess(true);
+      setButtonSuccess(true);
+      
+      // Reset button success state after 2 seconds
+      setTimeout(() => {
+        setButtonSuccess(false);
+      }, 2000);
     } catch (err: unknown) {
       const errorData: ErrorResponse = (err as { data?: ErrorResponse })?.data || {};
 
@@ -208,8 +217,28 @@ export default function SecuritySettings() {
               )}
             </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Updating...' : 'Update Password'}
+            <Button
+              type="submit"
+              className={cn(
+                "w-full",
+                buttonSuccess && "bg-green-600 hover:bg-green-700"
+              )}
+              disabled={loading}
+              variant={buttonSuccess ? "default" : "default"}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="animate-spin" />
+                  Updating...
+                </>
+              ) : buttonSuccess ? (
+                <>
+                  <Check />
+                  Saved!
+                </>
+              ) : (
+                'Update Password'
+              )}
             </Button>
           </div>
         </form>

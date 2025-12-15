@@ -5,6 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { api, ErrorResponse } from '@/utils/api';
+import { Loader2, Check } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface FieldErrors {
   email?: string[];
@@ -17,7 +19,7 @@ export default function AccountSettings() {
   const [fullName, setFullName] = useState(user?.full_name || '');
   const [email, setEmail] = useState(user?.email || '');
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [buttonSuccess, setButtonSuccess] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [generalError, setGeneralError] = useState<string | null>(null);
 
@@ -45,7 +47,6 @@ export default function AccountSettings() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setSuccess(false);
     setGeneralError(null);
 
     // Run client-side validation first
@@ -64,9 +65,14 @@ export default function AccountSettings() {
       // Refresh user data in context
       await refreshUser();
 
-      // Success - show success message
-      setSuccess(true);
+      // Success - show button success state
+      setButtonSuccess(true);
       setFieldErrors({});
+      
+      // Reset button success state after 2 seconds
+      setTimeout(() => {
+        setButtonSuccess(false);
+      }, 2000);
     } catch (err: unknown) {
       const errorData: ErrorResponse = (err as { data?: ErrorResponse })?.data || {};
 
@@ -111,13 +117,6 @@ export default function AccountSettings() {
       <SettingsCard>
         <form onSubmit={handleSubmit}>
           <div className="space-y-6">
-            {/* Success message */}
-            {success && (
-              <div className="p-3 rounded-md bg-green-500/10 border border-green-500/20 text-green-600 dark:text-green-400 text-sm text-center">
-                Profile updated successfully.
-              </div>
-            )}
-
             {/* General error message */}
             {(generalError || fieldErrors.non_field_errors) && (
               <div className="p-3 rounded-md bg-destructive/10 border border-destructive/20 text-destructive text-sm text-center">
@@ -173,8 +172,28 @@ export default function AccountSettings() {
               )}
             </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Saving...' : 'Save Changes'}
+            <Button
+              type="submit"
+              className={cn(
+                "w-full",
+                buttonSuccess && "bg-green-600 hover:bg-green-700"
+              )}
+              disabled={loading}
+              variant={buttonSuccess ? "default" : "default"}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="animate-spin" />
+                  Saving...
+                </>
+              ) : buttonSuccess ? (
+                <>
+                  <Check />
+                  Saved!
+                </>
+              ) : (
+                'Save Changes'
+              )}
             </Button>
           </div>
         </form>
