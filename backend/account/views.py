@@ -11,11 +11,9 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from account.models import UserTrainingPreferences
 from account.serializers import (
     LoginSerializer,
     RegisterSerializer,
-    TrainingPreferencesSerializer,
     UserSerializer,
 )
 
@@ -305,35 +303,3 @@ class CSRFTokenView(APIView):
             {"csrfToken": csrf_token},
             status=status.HTTP_200_OK,
         )
-
-
-class TrainingPreferencesView(APIView):
-    """
-    GET /api/preferences/training/
-    PUT /api/preferences/training/
-
-    Get or update the authenticated user's training preferences.
-    Auto-creates preferences if they don't exist.
-    """
-
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request: Request) -> Response:
-        """Return the authenticated user's training preferences."""
-        preferences, created = UserTrainingPreferences.objects.get_or_create(
-            user=request.user
-        )
-        serializer = TrainingPreferencesSerializer(preferences)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def put(self, request: Request) -> Response:
-        """Update the authenticated user's training preferences."""
-        preferences, created = UserTrainingPreferences.objects.get_or_create(
-            user=request.user
-        )
-        serializer = TrainingPreferencesSerializer(
-            preferences, data=request.data, partial=False
-        )
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)

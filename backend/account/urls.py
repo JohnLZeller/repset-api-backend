@@ -8,7 +8,6 @@ from account.views import (
     LogoutView,
     ProfileView,
     RegisterView,
-    TrainingPreferencesView,
 )
 
 urlpatterns = [
@@ -21,6 +20,4 @@ urlpatterns = [
     path("auth/csrf/", CSRFTokenView.as_view(), name="csrf_token"),
     # Profile endpoint
     path("profile/", ProfileView.as_view(), name="profile"),
-    # Training preferences endpoint
-    path("preferences/training/", TrainingPreferencesView.as_view(), name="training_preferences"),
 ]

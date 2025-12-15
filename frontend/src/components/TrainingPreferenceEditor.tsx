@@ -7,27 +7,39 @@ import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
 import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react'
 
-// Equipment type options matching backend enum
-const EQUIPMENT_OPTIONS = [
-  { value: 'barbell', label: 'Barbell' },
-  { value: 'dumbbell', label: 'Dumbbell' },
-  { value: 'plated', label: 'Plated' },
-  { value: 'selectorized', label: 'Selectorized' },
-  { value: 'spotter_recommended', label: 'Spotter Recommended' },
-  { value: 'suspension', label: 'Suspension' },
+// Equipment modality options matching backend enum
+const EQUIPMENT_MODALITY_OPTIONS = [
+  { value: 'free_weights', label: 'Free Weights' },
+  { value: 'machines', label: 'Machines' },
+  { value: 'cables', label: 'Cables' },
   { value: 'bodyweight', label: 'Bodyweight' },
+  { value: 'bands_suspension', label: 'Bands / Suspension' },
+] as const
+
+// Equipment station options matching backend enum
+const EQUIPMENT_STATION_OPTIONS = [
+  { value: 'rack', label: 'Rack' },
+  { value: 'bench', label: 'Bench' },
+  { value: 'pull_up_bar', label: 'Pull-up Bar' },
+  { value: 'dip_station', label: 'Dip Station' },
+  { value: 'floor', label: 'Floor' },
+] as const
+
+// Machine type options matching backend enum
+const MACHINE_TYPE_OPTIONS = [
+  { value: 'selectorized', label: 'Selectorized' },
+  { value: 'plate_loaded', label: 'Plate Loaded' },
+  { value: 'smith', label: 'Smith Machine' },
 ] as const
 
 // Exercise attribute options matching backend enum
 const EXERCISE_ATTRIBUTE_OPTIONS = [
-  { value: 'requires_partner', label: 'Requires Partner' },
   { value: 'high_impact', label: 'High Impact' },
-  { value: 'requires_spotter', label: 'Requires Spotter' },
-  { value: 'requires_platform', label: 'Requires Platform' },
-  { value: 'requires_rack', label: 'Requires Rack' },
-  { value: 'requires_bench', label: 'Requires Bench' },
-  { value: 'requires_cable_machine', label: 'Requires Cable Machine' },
-  { value: 'requires_pull_up_bar', label: 'Requires Pull-up Bar' },
+  { value: 'overhead', label: 'Overhead' },
+  { value: 'spotter_advised', label: 'Spotter Advised' },
+  { value: 'technically_complex', label: 'Technically Complex' },
+  { value: 'floor_required', label: 'Floor Required' },
+  { value: 'high_joint_stress', label: 'High Joint Stress' },
 ] as const
 
 export default function TrainingPreferenceEditor() {
@@ -71,13 +83,31 @@ export default function TrainingPreferenceEditor() {
     }
   }
 
-  const toggleEquipment = (value: string) => {
+  const toggleModality = (value: string) => {
     if (!preferences) return
-    const current = preferences.excluded_equipment || []
+    const current = preferences.excluded_equipment_modalities || []
     const updated = current.includes(value)
       ? current.filter((item) => item !== value)
       : [...current, value]
-    setPreferences({ ...preferences, excluded_equipment: updated })
+    setPreferences({ ...preferences, excluded_equipment_modalities: updated })
+  }
+
+  const toggleStation = (value: string) => {
+    if (!preferences) return
+    const current = preferences.excluded_equipment_stations || []
+    const updated = current.includes(value)
+      ? current.filter((item) => item !== value)
+      : [...current, value]
+    setPreferences({ ...preferences, excluded_equipment_stations: updated })
+  }
+
+  const toggleMachineType = (value: string) => {
+    if (!preferences) return
+    const current = preferences.excluded_machine_types || []
+    const updated = current.includes(value)
+      ? current.filter((item) => item !== value)
+      : [...current, value]
+    setPreferences({ ...preferences, excluded_machine_types: updated })
   }
 
   const toggleAttribute = (value: string) => {
@@ -135,22 +165,70 @@ export default function TrainingPreferenceEditor() {
           </div>
         )}
 
-        {/* Excluded Equipment */}
+        {/* Excluded Equipment Modalities */}
         <div className="space-y-3">
-          <Label className="text-base font-semibold">Excluded Equipment</Label>
+          <Label className="text-base font-semibold">Excluded Equipment Modalities</Label>
           <p className="text-sm text-muted-foreground">
-            Select equipment types to exclude from your workouts
+            Select how resistance is applied to exclude from your workouts
           </p>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {EQUIPMENT_OPTIONS.map((option) => (
+            {EQUIPMENT_MODALITY_OPTIONS.map((option) => (
               <label
                 key={option.value}
                 className="flex items-center space-x-2 p-2 rounded-md border border-input hover:bg-accent cursor-pointer"
               >
                 <input
                   type="checkbox"
-                  checked={preferences.excluded_equipment?.includes(option.value) || false}
-                  onChange={() => toggleEquipment(option.value)}
+                  checked={preferences.excluded_equipment_modalities?.includes(option.value) || false}
+                  onChange={() => toggleModality(option.value)}
+                  className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                />
+                <span className="text-sm">{option.label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Excluded Equipment Stations */}
+        <div className="space-y-3">
+          <Label className="text-base font-semibold">Excluded Equipment Stations</Label>
+          <p className="text-sm text-muted-foreground">
+            Select fixed stations or fixtures to exclude from your workouts
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {EQUIPMENT_STATION_OPTIONS.map((option) => (
+              <label
+                key={option.value}
+                className="flex items-center space-x-2 p-2 rounded-md border border-input hover:bg-accent cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  checked={preferences.excluded_equipment_stations?.includes(option.value) || false}
+                  onChange={() => toggleStation(option.value)}
+                  className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                />
+                <span className="text-sm">{option.label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Excluded Machine Types */}
+        <div className="space-y-3">
+          <Label className="text-base font-semibold">Excluded Machine Types</Label>
+          <p className="text-sm text-muted-foreground">
+            Select machine loading styles to exclude from your workouts
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {MACHINE_TYPE_OPTIONS.map((option) => (
+              <label
+                key={option.value}
+                className="flex items-center space-x-2 p-2 rounded-md border border-input hover:bg-accent cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  checked={preferences.excluded_machine_types?.includes(option.value) || false}
+                  onChange={() => toggleMachineType(option.value)}
                   className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                 />
                 <span className="text-sm">{option.label}</span>
@@ -186,32 +264,30 @@ export default function TrainingPreferenceEditor() {
         </div>
 
         {/* Sessions Per Week */}
-        <div className="space-y-2">
-          <Label htmlFor="sessions_per_week" className="text-base font-semibold">
-            Sessions Per Week
+        <div className="space-y-3">
+          <Label className="text-base font-semibold">
+            Sessions Per Week: {preferences.sessions_per_week}
           </Label>
-          <Input
-            id="sessions_per_week"
-            type="number"
-            min="1"
-            value={preferences.sessions_per_week}
-            onChange={(e) =>
-              setPreferences({
-                ...preferences,
-                sessions_per_week: parseInt(e.target.value) || 1,
-              })
+          <Slider
+            value={[preferences.sessions_per_week]}
+            onValueChange={(value) =>
+              setPreferences({ ...preferences, sessions_per_week: value[0] })
             }
+            min={1}
+            max={6}
+            step={1}
+            className="w-full"
           />
+          <p className="text-sm text-muted-foreground">
+            Number of training sessions per week
+          </p>
         </div>
 
         {/* Training Intensity */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <Label className="text-base font-semibold">Training Intensity</Label>
-            <span className="text-sm font-medium text-foreground">
-              {preferences.training_intensity}/10
-            </span>
-          </div>
+          <Label className="text-base font-semibold">
+            Training Intensity: {preferences.training_intensity}
+          </Label>
           <Slider
             value={[preferences.training_intensity]}
             onValueChange={(value) =>
@@ -228,22 +304,23 @@ export default function TrainingPreferenceEditor() {
         </div>
 
         {/* Session Time Limit */}
-        <div className="space-y-2">
-          <Label htmlFor="session_time_limit" className="text-base font-semibold">
-            Session Time Limit (minutes)
+        <div className="space-y-3">
+          <Label className="text-base font-semibold">
+            Session Time Limit (minutes): {preferences.max_session_mins}
           </Label>
-          <Input
-            id="session_time_limit"
-            type="number"
-            min="1"
-            value={preferences.session_time_limit}
-            onChange={(e) =>
-              setPreferences({
-                ...preferences,
-                session_time_limit: parseInt(e.target.value) || 1,
-              })
+          <Slider
+            value={[preferences.max_session_mins]}
+            onValueChange={(value) =>
+              setPreferences({ ...preferences, max_session_mins: value[0] })
             }
+            min={15}
+            max={120}
+            step={5}
+            className="w-full"
           />
+          <p className="text-sm text-muted-foreground">
+            Maximum duration for each training session
+          </p>
         </div>
       </CardContent>
       <CardFooter>

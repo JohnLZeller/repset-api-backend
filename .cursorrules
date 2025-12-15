@@ -20,3 +20,9 @@
 - Rebuild: `docker compose build` or `docker compose up --build`
 - Execute commands: `docker compose exec <service> <command>`
 
+## Django Migrations
+**IMPORTANT: When model changes are made, migrations may need to be created.**
+- After modifying Django models, run: `docker compose exec backend python manage.py makemigrations`
+- Then apply migrations: `docker compose exec backend python manage.py migrate`
+- Always check if migrations are needed after model changes (adding/removing fields, changing field types, etc.)
+

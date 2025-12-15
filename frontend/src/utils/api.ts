@@ -35,11 +35,13 @@ export interface ErrorResponse {
 }
 
 export interface TrainingPreferences {
-  excluded_equipment: string[]
+  excluded_equipment_modalities: string[]
+  excluded_equipment_stations: string[]
+  excluded_machine_types: string[]
   excluded_exercise_attributes: string[]
   sessions_per_week: number
   training_intensity: number
-  session_time_limit: number
+  max_session_mins: number
   updated_at: string
 }
 

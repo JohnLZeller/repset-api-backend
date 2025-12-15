@@ -10,9 +10,6 @@ from django.contrib.auth import (
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 
-from account.enums import EquipmentType, ExerciseAttribute
-from account.models import UserTrainingPreferences
-
 User = get_user_model()
 
 
@@ -112,64 +109,3 @@ class LoginSerializer(serializers.Serializer):
 
         attrs["user"] = user
         return attrs
-
-
-class TrainingPreferencesSerializer(serializers.ModelSerializer):
-    """Serializer for UserTrainingPreferences model."""
-
-    updated_at = serializers.ReadOnlyField()
-
-    class Meta:
-        model = UserTrainingPreferences
-        fields = [
-            "excluded_equipment",
-            "excluded_exercise_attributes",
-            "sessions_per_week",
-            "training_intensity",
-            "session_time_limit",
-            "updated_at",
-        ]
-
-    def validate_training_intensity(self, value: int) -> int:
-        """Validate training_intensity is between 1 and 10."""
-        if not (1 <= value <= 10):
-            raise serializers.ValidationError(
-                "Training intensity must be between 1 and 10."
-            )
-        return value
-
-    def validate_sessions_per_week(self, value: int) -> int:
-        """Validate sessions_per_week is positive."""
-        if value <= 0:
-            raise serializers.ValidationError(
-                "Sessions per week must be a positive number."
-            )
-        return value
-
-    def validate_session_time_limit(self, value: int) -> int:
-        """Validate session_time_limit is positive."""
-        if value <= 0:
-            raise serializers.ValidationError(
-                "Session time limit must be a positive number."
-            )
-        return value
-
-    def validate_excluded_equipment(self, value: list[str]) -> list[str]:
-        """Validate excluded_equipment contains valid choices."""
-        valid_choices = {choice[0] for choice in EquipmentType.choices}
-        for item in value:
-            if item not in valid_choices:
-                raise serializers.ValidationError(
-                    f"'{item}' is not a valid equipment type."
-                )
-        return value
-
-    def validate_excluded_exercise_attributes(self, value: list[str]) -> list[str]:
-        """Validate excluded_exercise_attributes contains valid choices."""
-        valid_choices = {choice[0] for choice in ExerciseAttribute.choices}
-        for item in value:
-            if item not in valid_choices:
-                raise serializers.ValidationError(
-                    f"'{item}' is not a valid exercise attribute."
-                )
-        return value

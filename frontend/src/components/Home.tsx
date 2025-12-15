@@ -1,4 +1,5 @@
 import { useAuth } from '../contexts/AuthContext'
+import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
 import { Dumbbell, LogOut, User, Mail, Calendar, Shield, Settings } from 'lucide-react'
@@ -16,15 +17,15 @@ export default function Home() {
       <header className="bg-card border-b border-border">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+            <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer">
               <Dumbbell className="w-6 h-6 text-primary" strokeWidth={2.5} />
               <h1 className="text-2xl font-bold text-foreground">RepSet</h1>
-            </div>
+            </Link>
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="sm" asChild>
-                <a href="/profile" className="gap-2">
+                <a href="/settings" className="gap-2">
                   <Settings className="w-4 h-4" />
-                  Profile
+                  Settings
                 </a>
               </Button>
               <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-2">

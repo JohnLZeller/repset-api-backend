@@ -15,8 +15,13 @@ from django.test import TestCase, override_settings
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from account.enums import EquipmentType, ExerciseAttribute
-from account.models import UserTrainingPreferences
+from training.enums import (
+    EquipmentModality,
+    EquipmentStation,
+    ExerciseAttribute,
+    MachineType,
+)
+from training.models import UserTrainingPreferences
 
 User = get_user_model()
 
@@ -76,8 +81,10 @@ class AutoCreationTests(TrainingPreferencesAPITestCase):
         preferences = UserTrainingPreferences.objects.get(user=user)
         self.assertEqual(preferences.sessions_per_week, 3)
         self.assertEqual(preferences.training_intensity, 5)
-        self.assertEqual(preferences.session_time_limit, 60)
-        self.assertEqual(preferences.excluded_equipment, [])
+        self.assertEqual(preferences.max_session_mins, 60)
+        self.assertEqual(preferences.excluded_equipment_modalities, [])
+        self.assertEqual(preferences.excluded_equipment_stations, [])
+        self.assertEqual(preferences.excluded_machine_types, [])
         self.assertEqual(preferences.excluded_exercise_attributes, [])
 
 
@@ -94,8 +101,10 @@ class GETTests(TrainingPreferencesAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["sessions_per_week"], 3)
         self.assertEqual(response.data["training_intensity"], 5)
-        self.assertEqual(response.data["session_time_limit"], 60)
-        self.assertEqual(response.data["excluded_equipment"], [])
+        self.assertEqual(response.data["max_session_mins"], 60)
+        self.assertEqual(response.data["excluded_equipment_modalities"], [])
+        self.assertEqual(response.data["excluded_equipment_stations"], [])
+        self.assertEqual(response.data["excluded_machine_types"], [])
         self.assertEqual(response.data["excluded_exercise_attributes"], [])
         self.assertIn("updated_at", response.data)
 
@@ -128,43 +137,64 @@ class PUTTests(TrainingPreferencesAPITestCase):
         self.login_user(user)
 
         data = {
-            "excluded_equipment": [EquipmentType.BARBELL, EquipmentType.DUMBBELL],
+            "excluded_equipment_modalities": [
+                EquipmentModality.FREE_WEIGHTS,
+                EquipmentModality.MACHINES,
+            ],
+            "excluded_equipment_stations": [EquipmentStation.RACK],
+            "excluded_machine_types": [MachineType.SELECTORIZED],
             "excluded_exercise_attributes": [
-                ExerciseAttribute.REQUIRES_PARTNER,
                 ExerciseAttribute.HIGH_IMPACT,
+                ExerciseAttribute.SPOTTER_ADVISED,
             ],
             "sessions_per_week": 5,
             "training_intensity": 8,
-            "session_time_limit": 90,
+            "max_session_mins": 90,
         }
 
         response = self.client.put(self.preferences_url, data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            set(response.data["excluded_equipment"]),
-            {EquipmentType.BARBELL, EquipmentType.DUMBBELL},
+            set(response.data["excluded_equipment_modalities"]),
+            {EquipmentModality.FREE_WEIGHTS, EquipmentModality.MACHINES},
+        )
+        self.assertEqual(
+            set(response.data["excluded_equipment_stations"]),
+            {EquipmentStation.RACK},
+        )
+        self.assertEqual(
+            set(response.data["excluded_machine_types"]),
+            {MachineType.SELECTORIZED},
         )
         self.assertEqual(
             set(response.data["excluded_exercise_attributes"]),
             {
-                ExerciseAttribute.REQUIRES_PARTNER,
                 ExerciseAttribute.HIGH_IMPACT,
+                ExerciseAttribute.SPOTTER_ADVISED,
             },
         )
         self.assertEqual(response.data["sessions_per_week"], 5)
         self.assertEqual(response.data["training_intensity"], 8)
-        self.assertEqual(response.data["session_time_limit"], 90)
+        self.assertEqual(response.data["max_session_mins"], 90)
 
         # Verify in database
         preferences = UserTrainingPreferences.objects.get(user=user)
         self.assertEqual(
-            set(preferences.excluded_equipment),
-            {EquipmentType.BARBELL, EquipmentType.DUMBBELL},
+            set(preferences.excluded_equipment_modalities),
+            {EquipmentModality.FREE_WEIGHTS, EquipmentModality.MACHINES},
+        )
+        self.assertEqual(
+            set(preferences.excluded_equipment_stations),
+            {EquipmentStation.RACK},
+        )
+        self.assertEqual(
+            set(preferences.excluded_machine_types),
+            {MachineType.SELECTORIZED},
         )
         self.assertEqual(preferences.sessions_per_week, 5)
         self.assertEqual(preferences.training_intensity, 8)
-        self.assertEqual(preferences.session_time_limit, 90)
+        self.assertEqual(preferences.max_session_mins, 90)
 
     def test_put_requires_authentication(self) -> None:
         """Test PUT endpoint requires authentication."""
@@ -215,27 +245,47 @@ class ValidationTests(TrainingPreferencesAPITestCase):
         response = self.client.put(self.preferences_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_validate_session_time_limit_positive(self) -> None:
-        """Test session_time_limit must be positive."""
-        data = {"session_time_limit": 0}
+    def test_validate_max_session_mins_positive(self) -> None:
+        """Test max_session_mins must be positive."""
+        data = {"max_session_mins": 0}
         response = self.client.put(self.preferences_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-        data = {"session_time_limit": -1}
+        data = {"max_session_mins": -1}
         response = self.client.put(self.preferences_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-        data = {"session_time_limit": 1}
+        data = {"max_session_mins": 1}
         response = self.client.put(self.preferences_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_validate_excluded_equipment_choices(self) -> None:
-        """Test excluded_equipment must contain valid choices."""
-        data = {"excluded_equipment": ["invalid_equipment"]}
+    def test_validate_excluded_equipment_modalities_choices(self) -> None:
+        """Test excluded_equipment_modalities must contain valid choices."""
+        data = {"excluded_equipment_modalities": ["invalid_modality"]}
         response = self.client.put(self.preferences_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-        data = {"excluded_equipment": [EquipmentType.BARBELL]}
+        data = {"excluded_equipment_modalities": [EquipmentModality.FREE_WEIGHTS]}
+        response = self.client.put(self.preferences_url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_validate_excluded_equipment_stations_choices(self) -> None:
+        """Test excluded_equipment_stations must contain valid choices."""
+        data = {"excluded_equipment_stations": ["invalid_station"]}
+        response = self.client.put(self.preferences_url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        data = {"excluded_equipment_stations": [EquipmentStation.RACK]}
+        response = self.client.put(self.preferences_url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_validate_excluded_machine_types_choices(self) -> None:
+        """Test excluded_machine_types must contain valid choices."""
+        data = {"excluded_machine_types": ["invalid_type"]}
+        response = self.client.put(self.preferences_url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        data = {"excluded_machine_types": [MachineType.SELECTORIZED]}
         response = self.client.put(self.preferences_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -246,7 +296,7 @@ class ValidationTests(TrainingPreferencesAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         data = {
-            "excluded_exercise_attributes": [ExerciseAttribute.REQUIRES_PARTNER]
+            "excluded_exercise_attributes": [ExerciseAttribute.HIGH_IMPACT]
         }
         response = self.client.put(self.preferences_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)

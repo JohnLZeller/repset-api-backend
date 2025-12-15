@@ -3,7 +3,7 @@ import { useAuth } from './contexts/AuthContext'
 import Login from './components/Login'
 import Register from './components/Register'
 import Home from './components/Home'
-import Profile from './components/Profile'
+import Settings from './components/settings/Settings'
 import ProtectedRoute from './components/ProtectedRoute'
 import { Dumbbell } from 'lucide-react'
 
@@ -42,10 +42,10 @@ function App() {
         }
       />
       <Route
-        path="/profile"
+        path="/settings"
         element={
           <ProtectedRoute>
-            <Profile />
+            <Settings />
           </ProtectedRoute>
         }
       />
