@@ -1,47 +1,47 @@
-import { useState, useEffect } from 'react'
-import './App.css'
+import { Routes, Route, Navigate } from 'react-router-dom'
+import { useAuth } from './contexts/AuthContext'
+import Login from './components/Login'
+import Register from './components/Register'
+import Home from './components/Home'
+import ProtectedRoute from './components/ProtectedRoute'
+import { Dumbbell } from 'lucide-react'
 
 function App() {
-  const [apiStatus, setApiStatus] = useState<string>('Checking...')
+  const { user, loading } = useAuth()
 
-  useEffect(() => {
-    // Test connection to backend API
-    fetch('/api/auth/csrf/')
-      .then((response) => {
-        if (response.ok) {
-          setApiStatus('Connected')
-        } else {
-          setApiStatus('Error: ' + response.status)
-        }
-      })
-      .catch(() => {
-        setApiStatus('Not connected')
-      })
-  }, [])
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-hero-gradient-start to-hero-gradient-end">
+        <div className="flex flex-col items-center gap-4">
+          <div className="p-4 bg-primary rounded-full animate-pulse-soft">
+            <Dumbbell className="w-10 h-10 text-primary-foreground" strokeWidth={2.5} />
+          </div>
+          <p className="text-lg font-semibold text-foreground">Loading...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div className="app">
-      <header className="app-header">
-        <h1>Repset</h1>
-        <p>Frontend + Backend Docker Setup</p>
-      </header>
-      <main className="app-main">
-        <div className="status-card">
-          <h2>Backend API Status</h2>
-          <p className={`status ${apiStatus === 'Connected' ? 'connected' : 'disconnected'}`}>
-            {apiStatus}
-          </p>
-        </div>
-        <div className="info-card">
-          <h2>Getting Started</h2>
-          <ul>
-            <li>Frontend: <code>http://localhost:5173</code></li>
-            <li>Backend API: <code>http://localhost:8000</code></li>
-            <li>Admin: <code>http://localhost:8000/admin</code></li>
-          </ul>
-        </div>
-      </main>
-    </div>
+    <Routes>
+      <Route
+        path="/login"
+        element={user ? <Navigate to="/" replace /> : <Login />}
+      />
+      <Route
+        path="/register"
+        element={user ? <Navigate to="/" replace /> : <Register />}
+      />
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   )
 }
 

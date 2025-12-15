@@ -1,26 +1,173 @@
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-  color-scheme: dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #1a1a2e;
+/* Design System - Warm & Inviting Fitness SaaS
+   Background: Soft mustard yellow
+   Accents: Charcoal and white
+   All colors MUST be HSL.
+*/
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@layer base {
+  :root {
+    /* Vibrant golden yellow base - matches ColorControls default */
+    --background: 47 100% 58%;
+    --foreground: 220 15% 18%;
+
+    /* White cards for contrast */
+    --card: 0 0% 100%;
+    --card-foreground: 220 15% 18%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 15% 18%;
+
+    /* Charcoal primary for strong contrast */
+    --primary: 220 12% 22%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Slightly muted yellow for secondary elements */
+    --secondary: 47 90% 51%;
+    --secondary-foreground: 220 15% 18%;
+
+    /* Muted yellow tones */
+    --muted: 47 80% 54%;
+    --muted-foreground: 220 10% 45%;
+
+    /* Deeper golden accent for highlights */
+    --accent: 227 100% 58%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Subtle borders */
+    --border: 47 20% 48%;
+    --input: 0 0% 100%;
+    --ring: 220 12% 22%;
+
+    --radius: 0.75rem;
+    
+    /* Hero gradient - warm golden tones */
+    --hero-gradient-start: 47 95% 60%;
+    --hero-gradient-end: 47 100% 54%;
+    
+    /* Surface variants */
+    --surface-elevated: 0 0% 100%;
+    
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --sidebar-background: 220 12% 22%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 42 85% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 12% 28%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 220 10% 30%;
+    --sidebar-ring: 42 85% 45%;
+  }
+
+  .dark {
+    /* Dark mode with charcoal base and mustard accents */
+    --background: 220 15% 12%;
+    --foreground: 45 30% 95%;
+
+    --card: 220 15% 16%;
+    --card-foreground: 45 30% 95%;
+
+    --popover: 220 15% 16%;
+    --popover-foreground: 45 30% 95%;
+
+    /* Mustard primary in dark mode */
+    --primary: 42 85% 55%;
+    --primary-foreground: 220 15% 12%;
+
+    --secondary: 220 15% 20%;
+    --secondary-foreground: 45 30% 95%;
+
+    --muted: 220 12% 22%;
+    --muted-foreground: 220 10% 60%;
+
+    --accent: 42 85% 50%;
+    --accent-foreground: 220 15% 12%;
+
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 45 30% 95%;
+
+    --border: 220 12% 25%;
+    --input: 220 15% 20%;
+    --ring: 42 85% 55%;
+    
+    --hero-gradient-start: 220 15% 8%;
+    --hero-gradient-end: 220 15% 14%;
+    
+    --sidebar-background: 220 15% 10%;
+    --sidebar-foreground: 45 30% 95%;
+    --sidebar-primary: 42 85% 55%;
+    --sidebar-primary-foreground: 220 15% 12%;
+    --sidebar-accent: 220 15% 16%;
+    --sidebar-accent-foreground: 45 30% 95%;
+    --sidebar-border: 220 12% 25%;
+    --sidebar-ring: 42 85% 55%;
+  }
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    min-width: 320px;
+    min-height: 100vh;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
 }
 
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
+@layer utilities {
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+  
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  @keyframes glow {
+    0%, 100% {
+      box-shadow: 0 0 20px hsl(42 85% 45% / 0.3);
+    }
+    50% {
+      box-shadow: 0 0 40px hsl(42 85% 45% / 0.5);
+    }
+  }
+  
+  .animate-glow {
+    animation: glow 3s ease-in-out infinite;
+  }
+  
+  @keyframes pulse-soft {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+  
+  .animate-pulse-soft {
+    animation: pulse-soft 2s ease-in-out infinite;
+  }
 }
