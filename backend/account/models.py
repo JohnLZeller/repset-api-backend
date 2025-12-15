@@ -70,5 +70,21 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Meta:
         ordering = ["-created_at"]
 
+    @property
+    def first_name(self) -> str:
+        """Return the first name from full_name."""
+        if not self.full_name:
+            return ""
+        parts = self.full_name.strip().split(maxsplit=1)
+        return parts[0] if parts else ""
+
+    @property
+    def last_name(self) -> str:
+        """Return the last name from full_name."""
+        if not self.full_name:
+            return ""
+        parts = self.full_name.strip().split(maxsplit=1)
+        return parts[1] if len(parts) > 1 else ""
+
     def __str__(self) -> str:
         return f"User #{self.id}: {self.email}"

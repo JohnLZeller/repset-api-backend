@@ -32,7 +32,7 @@ export default function Home() {
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-foreground">
-            Welcome back, {user?.full_name || user?.email}!
+            Welcome back, {user?.first_name || user?.full_name || user?.email}!
           </h2>
           <p className="text-muted-foreground mt-1">Here's your account overview</p>
         </div>
@@ -56,13 +56,29 @@ export default function Home() {
               </div>
               
               {user?.full_name && (
-                <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                  <User className="w-5 h-5 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">Full Name</p>
-                    <p className="font-medium text-foreground">{user.full_name}</p>
+                <>
+                  <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                    <User className="w-5 h-5 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm text-muted-foreground">First Name</p>
+                      <p className="font-medium text-foreground">{user.first_name || 'N/A'}</p>
+                    </div>
                   </div>
-                </div>
+                  <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                    <User className="w-5 h-5 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm text-muted-foreground">Last Name</p>
+                      <p className="font-medium text-foreground">{user.last_name || 'N/A'}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                    <User className="w-5 h-5 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm text-muted-foreground">Full Name</p>
+                      <p className="font-medium text-foreground">{user.full_name}</p>
+                    </div>
+                  </div>
+                </>
               )}
               
               <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
