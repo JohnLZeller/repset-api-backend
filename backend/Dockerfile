@@ -1,6 +1,9 @@
 # Backend Dockerfile
 FROM python:3.12-slim
 
+# Build arguments (provided via docker-compose or --build-arg)
+ARG SECRET_KEY
+
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
@@ -22,7 +25,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Collect static files
-RUN python manage.py collectstatic --noinput
+RUN SECRET_KEY=${SECRET_KEY} python manage.py collectstatic --noinput
 
 # Expose port
 EXPOSE 8000
