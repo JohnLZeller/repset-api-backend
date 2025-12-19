@@ -39,3 +39,23 @@ class ExerciseAttribute(models.TextChoices):
     FLOOR_REQUIRED = "floor_required", "Floor Required"
     HIGH_JOINT_STRESS = "high_joint_stress", "High Joint Stress"
 
+
+class WorkoutFocus(models.TextChoices):
+    CHEST = "chest", "Chest"
+    BACK = "back", "Back"
+    LEGS = "legs", "Legs"
+    ARMS = "arms", "Arms"
+    SHOULDERS = "shoulders", "Shoulders"
+    CORE = "core", "Core"
+    FULL_BODY = "full_body", "Full Body"
+    CHEST_TRICEPS = "chest_triceps", "Chest & Triceps"
+    BACK_BICEPS = "back_biceps", "Back & Biceps"
+    PUSH = "push", "Push"
+    PULL = "pull", "Pull"
+
+
+class WorkoutStatus(models.TextChoices):
+    SCHEDULED = "scheduled", "Scheduled"
+    IN_PROGRESS = "in_progress", "In Progress"
+    COMPLETED = "completed", "Completed"
+

@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     "corsheaders",
     # Local apps
     "account",
+    "catalog",
+    "gym",
     "training",
 ]
 

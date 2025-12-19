@@ -56,6 +56,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     full_name = models.CharField(max_length=255, blank=True)
 
+    gym = models.ForeignKey(
+        "gym.Gym",
+        on_delete=models.PROTECT,
+        null=True,  # Initially nullable for existing users
+        blank=True,
+        related_name="members",
+    )
+
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
