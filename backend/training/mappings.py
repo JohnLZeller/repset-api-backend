@@ -1,111 +1,99 @@
 from __future__ import annotations
 
-from catalog.enums import MuscleGroup
-from training.enums import WorkoutFocus
+from collections.abc import Iterable
 
-# Mapping of workout focuses to their primary muscle groups
-# Uses string values (first element of TextChoices tuples)
-WORKOUT_FOCUS_TO_MUSCLE_GROUPS: dict[str, list[str]] = {
-    WorkoutFocus.CHEST: [
-        MuscleGroup.CHEST,
-        MuscleGroup.FRONT_DELTS,
-        MuscleGroup.TRICEPS,
-    ],
-    WorkoutFocus.BACK: [
-        MuscleGroup.LATS,
-        MuscleGroup.UPPER_BACK,
-        MuscleGroup.REAR_DELTS,
-        MuscleGroup.BICEPS,
-    ],
-    WorkoutFocus.LEGS: [
-        MuscleGroup.QUADS,
-        MuscleGroup.HAMSTRINGS,
-        MuscleGroup.GLUTES,
-        MuscleGroup.CALVES,
-    ],
-    WorkoutFocus.ARMS: [
-        MuscleGroup.BICEPS,
-        MuscleGroup.TRICEPS,
-        MuscleGroup.FOREARMS,
-    ],
-    WorkoutFocus.SHOULDERS: [
-        MuscleGroup.FRONT_DELTS,
-        MuscleGroup.SIDE_DELTS,
-        MuscleGroup.REAR_DELTS,
-    ],
-    WorkoutFocus.CORE: [
-        MuscleGroup.ABS,
-        MuscleGroup.OBLIQUES,
-        MuscleGroup.LOWER_BACK,
-    ],
-    WorkoutFocus.FULL_BODY: [
-        # All major muscle groups
-        MuscleGroup.CHEST,
-        MuscleGroup.FRONT_DELTS,
-        MuscleGroup.SIDE_DELTS,
-        MuscleGroup.TRICEPS,
-        MuscleGroup.LATS,
-        MuscleGroup.UPPER_BACK,
-        MuscleGroup.REAR_DELTS,
-        MuscleGroup.BICEPS,
-        MuscleGroup.ABS,
-        MuscleGroup.OBLIQUES,
-        MuscleGroup.LOWER_BACK,
-        MuscleGroup.QUADS,
-        MuscleGroup.HAMSTRINGS,
-        MuscleGroup.GLUTES,
-        MuscleGroup.CALVES,
-    ],
-    WorkoutFocus.CHEST_TRICEPS: [
-        MuscleGroup.CHEST,
-        MuscleGroup.FRONT_DELTS,
-        MuscleGroup.TRICEPS,
-    ],
-    WorkoutFocus.BACK_BICEPS: [
-        MuscleGroup.LATS,
-        MuscleGroup.UPPER_BACK,
-        MuscleGroup.REAR_DELTS,
-        MuscleGroup.BICEPS,
-    ],
-    WorkoutFocus.PUSH: [
-        # Push movements: chest, shoulders, triceps
-        MuscleGroup.CHEST,
-        MuscleGroup.FRONT_DELTS,
-        MuscleGroup.SIDE_DELTS,
-        MuscleGroup.TRICEPS,
-    ],
-    WorkoutFocus.PULL: [
-        # Pull movements: back, rear delts, biceps
-        MuscleGroup.LATS,
-        MuscleGroup.UPPER_BACK,
-        MuscleGroup.REAR_DELTS,
-        MuscleGroup.BICEPS,
-        MuscleGroup.FOREARMS,
-    ],
-}
+from catalog.enums import (
+    MajorMuscleGroup,
+    MuscleGroup,
+    WorkoutRegion,
+    major_group_for,
+    regions_for_muscle_groups,
+)
+from training.enums import MovementPattern
 
 
-def get_muscle_groups_for_focus(focus: str | WorkoutFocus) -> list[str]:
+def derive_workout_label(
+    muscle_groups: Iterable[MuscleGroup],
+    movement_patterns: Iterable[MovementPattern] | None = None,
+) -> str | None:
     """
-    Get the list of muscle groups for a given workout focus.
+    Generate a display label from muscle groups and movement patterns.
 
-    Args:
-        focus: A WorkoutFocus choice value (string or enum member)
+    Returns None if no clear label can be derived.
 
-    Returns:
-        List of MuscleGroup choice values (strings)
+    Priority order:
+    1. If movement pattern is PUSH and upper-body muscles dominate -> "Push"
+    2. If movement pattern is PULL and upper-body muscles dominate -> "Pull"
+    3. If muscle_groups include Chest + Triceps (no back/biceps) -> "Chest & Triceps"
+    4. If muscle_groups include Back muscles + Biceps (no chest/triceps) -> "Back & Biceps"
+    5. If regions include both UPPER_BODY and LOWER_BODY -> "Full Body"
+    6. If only one major muscle group -> use that label (e.g., "Chest", "Back")
+    7. Otherwise -> None
     """
-    # Normalize focus to enum member for dictionary lookup
-    if isinstance(focus, str):
-        # Try to find matching enum member
-        try:
-            focus_enum = WorkoutFocus(focus)
-        except ValueError:
-            # If not a valid focus, return empty list
-            return []
-    else:
-        focus_enum = focus
+    muscle_groups_list = list(muscle_groups)
+    if not muscle_groups_list:
+        return None
 
-    muscle_groups = WORKOUT_FOCUS_TO_MUSCLE_GROUPS.get(focus_enum, [])
-    # Convert enum members to their string values
-    return [mg.value if hasattr(mg, "value") else str(mg) for mg in muscle_groups]
+    # Get regions and major muscle groups
+    regions = regions_for_muscle_groups(muscle_groups_list)
+    major_groups = {major_group_for(mg) for mg in muscle_groups_list}
+
+    # Rule 1 & 2: Check movement patterns for Push/Pull
+    if movement_patterns:
+        movement_patterns_list = list(movement_patterns)
+        has_push = any(
+            (mp == MovementPattern.PUSH)
+            or (hasattr(mp, "value") and mp.value == "push")
+            or (isinstance(mp, str) and mp == "push")
+            for mp in movement_patterns_list
+        )
+        has_pull = any(
+            (mp == MovementPattern.PULL)
+            or (hasattr(mp, "value") and mp.value == "pull")
+            or (isinstance(mp, str) and mp == "pull")
+            for mp in movement_patterns_list
+        )
+
+        # Check if upper-body muscles dominate
+        upper_body_majors = {
+            MajorMuscleGroup.CHEST,
+            MajorMuscleGroup.BACK,
+            MajorMuscleGroup.SHOULDERS,
+            MajorMuscleGroup.ARMS,
+        }
+        has_upper_body = bool(major_groups & upper_body_majors)
+        has_lower_body = bool(
+            major_groups & {MajorMuscleGroup.HIPS, MajorMuscleGroup.LEGS}
+        )
+
+        if has_push and has_upper_body and not has_lower_body:
+            return "Push"
+        if has_pull and has_upper_body and not has_lower_body:
+            return "Pull"
+
+    # Rule 3: Chest & Triceps (no back/biceps)
+    has_chest = MuscleGroup.CHEST in muscle_groups_list
+    has_triceps = MuscleGroup.TRICEPS in muscle_groups_list
+    has_back = any(
+        mg in muscle_groups_list for mg in [MuscleGroup.LATS, MuscleGroup.UPPER_BACK]
+    )
+    has_biceps = MuscleGroup.BICEPS in muscle_groups_list
+
+    if has_chest and has_triceps and not has_back and not has_biceps:
+        return "Chest & Triceps"
+
+    # Rule 4: Back & Biceps (no chest/triceps)
+    if has_back and has_biceps and not has_chest and not has_triceps:
+        return "Back & Biceps"
+
+    # Rule 5: Full Body
+    if WorkoutRegion.FULL_BODY in regions:
+        return "Full Body"
+
+    # Rule 6: Single major muscle group
+    if len(major_groups) == 1:
+        major = next(iter(major_groups))
+        return major.label
+
+    # Rule 7: No clear label
+    return None

@@ -40,18 +40,21 @@ class ExerciseAttribute(models.TextChoices):
     HIGH_JOINT_STRESS = "high_joint_stress", "High Joint Stress"
 
 
-class WorkoutFocus(models.TextChoices):
-    CHEST = "chest", "Chest"
-    BACK = "back", "Back"
-    LEGS = "legs", "Legs"
-    ARMS = "arms", "Arms"
-    SHOULDERS = "shoulders", "Shoulders"
-    CORE = "core", "Core"
-    FULL_BODY = "full_body", "Full Body"
-    CHEST_TRICEPS = "chest_triceps", "Chest & Triceps"
-    BACK_BICEPS = "back_biceps", "Back & Biceps"
+class MovementPattern(models.TextChoices):
+    """
+    Movement-based exercise classification.
+    Note: Push/Pull/Legs is a movement-based split, not anatomical grouping.
+    """
+
     PUSH = "push", "Push"
     PULL = "pull", "Pull"
+    SQUAT = "squat", "Squat"
+    HINGE = "hinge", "Hinge"
+    LUNGE = "lunge", "Lunge"
+    CARRY = "carry", "Carry"
+    ROTATION = "rotation", "Rotation"
+    ANTI_ROTATION = "anti_rotation", "Anti-Rotation"
+    LOCOMOTION = "locomotion", "Locomotion"
 
 
 class WorkoutStatus(models.TextChoices):

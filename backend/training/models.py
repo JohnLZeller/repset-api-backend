@@ -9,7 +9,6 @@ from training.enums import (
     EquipmentStation,
     EquipmentType,
     ExerciseAttribute,
-    WorkoutFocus,
     WorkoutStatus,
 )
 
@@ -69,7 +68,6 @@ class Workout(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="workouts")
     workout_number = models.PositiveIntegerField()
-    focus = models.CharField(max_length=50, choices=WorkoutFocus.choices)
     status = models.CharField(
         max_length=20,
         choices=WorkoutStatus.choices,
