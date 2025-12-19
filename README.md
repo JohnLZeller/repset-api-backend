@@ -14,6 +14,9 @@ repset-api-backend/
 │   ├── requirements.txt
 │   ├── core/             # Django project settings
 │   ├── account/          # User authentication app
+│   ├── catalog/          # Master catalog (Exercise, Machine)
+│   ├── gym/              # Gym locations and machine inventory
+│   ├── training/         # Workout tracking and preferences
 │   └── docs/             # API documentation
 └── frontend/             # React + Vite + TypeScript
     ├── Dockerfile
@@ -151,6 +154,82 @@ npm install
 
 # Start dev server
 npm run dev
+```
+
+## Data Models
+
+### App Architecture
+
+The backend is organized into four main Django apps:
+
+1. **account** - User authentication and profiles
+
+   - `User` - Custom user model with email authentication
+   - Users belong to exactly one `Gym`
+
+2. **catalog** - Master catalog of exercises and machines
+
+   - `Exercise` - Master catalog of exercises with primary/secondary muscles
+   - `Machine` - Master catalog of machine types (brand, equipment type)
+   - `MuscleGroup` enum - 17 muscle groups (chest, lats, quads, etc.)
+
+3. **gym** - Gym locations and machine inventory
+
+   - `Gym` - Physical gym locations with full address fields
+   - `GymMachine` - Links a `Machine` to a `Gym` with a local machine number
+
+4. **training** - Workout tracking and user preferences
+   - `UserTrainingPreferences` - User's equipment exclusions and training schedule
+   - `Workout` - User's workout sessions with focus and status
+   - `WorkoutExercise` - Links exercise + gym machine to a workout
+   - `WorkoutSet` - Individual sets with target and actual weight/reps
+   - `WorkoutFocus` enum - 11 workout focus types (chest, back, legs, push, pull, etc.)
+   - `WorkoutStatus` enum - Workout states (scheduled, in_progress, completed)
+
+### Model Relationships
+
+```
+User → Gym (many-to-one)
+Gym → GymMachine (one-to-many)
+Machine → GymMachine (one-to-many)
+User → Workout (one-to-many)
+Workout → WorkoutExercise (one-to-many)
+WorkoutExercise → Exercise (many-to-one)
+WorkoutExercise → GymMachine (many-to-one)
+WorkoutExercise → WorkoutSet (one-to-many)
+```
+
+### Workout Focus to Muscle Group Mapping
+
+The `training.mappings` module provides a mapping from workout focuses to their primary muscle groups. This is used for workout generation logic.
+
+**Available Focuses:**
+
+- `CHEST` → chest, front delts, triceps
+- `BACK` → lats, upper back, rear delts, biceps
+- `LEGS` → quads, hamstrings, glutes, calves
+- `ARMS` → biceps, triceps, forearms
+- `SHOULDERS` → front/side/rear delts
+- `CORE` → abs, obliques, lower back
+- `FULL_BODY` → all major muscle groups
+- `CHEST_TRICEPS` → chest, front delts, triceps
+- `BACK_BICEPS` → lats, upper back, rear delts, biceps
+- `PUSH` → chest, shoulders, triceps
+- `PULL` → back, rear delts, biceps, forearms
+
+**Usage:**
+
+```python
+from training.mappings import get_muscle_groups_for_focus
+from training.enums import WorkoutFocus
+
+# Get muscle groups for a focus
+muscle_groups = get_muscle_groups_for_focus(WorkoutFocus.CHEST)
+# Returns: ['chest', 'front_delts', 'triceps']
+
+# Also works with string values
+muscle_groups = get_muscle_groups_for_focus('pull')
+# Returns: ['lats', 'upper_back', 'rear_delts', 'biceps', 'forearms']
 ```
 
 ## API Endpoints
