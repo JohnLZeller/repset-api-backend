@@ -34,6 +34,7 @@ class GymEquipment(models.Model):
     )  # Gym-specific identifier
 
     class Meta:
+        verbose_name_plural = "Gym equipment"
         unique_together = ["gym", "equipment_display_number"]
 
     def __str__(self) -> str:

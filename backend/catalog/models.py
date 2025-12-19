@@ -27,6 +27,9 @@ class Equipment(models.Model):
     equipment_type = models.CharField(max_length=50, choices=EquipmentType.choices)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name_plural = "Equipment"
+
     def __str__(self) -> str:
         return f"{self.brand}, {self.name} ({self.equipment_type})"
 
