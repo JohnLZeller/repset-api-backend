@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "catalog",
     "gym",
     "training",
+    "scripts",  # Management commands
 ]
 
 MIDDLEWARE = [

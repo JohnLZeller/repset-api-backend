@@ -1,0 +1,17 @@
+{
+  "name": "repset-snaplet-seed",
+  "version": "1.0.0",
+  "description": "Snaplet Seed configuration for generating demo data",
+  "type": "module",
+  "scripts": {
+    "seed": "tsx seed.ts"
+  },
+  "dependencies": {
+    "@snaplet/seed": "^0.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  }
+}

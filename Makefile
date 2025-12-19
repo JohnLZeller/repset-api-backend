@@ -1,4 +1,4 @@
-.PHONY: help install up down restart build logs shell test migrate makemigrations createsuperuser clean clean-all setup frontend-install frontend-build frontend-lint backend-shell backend-test backend-collectstatic
+.PHONY: help install up down restart build logs shell test migrate makemigrations createsuperuser clean clean-all setup frontend-install frontend-build frontend-lint backend-shell backend-test backend-collectstatic demo-check demo-init demo-clear demo-load demo-reset
 
 # Default target
 .DEFAULT_GOAL := help
@@ -177,3 +177,59 @@ urls: ## Show access URLs
 	@echo "  Backend API: http://localhost:8000/api"
 	@echo "  Admin:       http://localhost:8000/admin"
 	@echo "  Database:    localhost:5432"
+
+# Demo data management (Snaplet)
+demo-check: ## Internal: Check DEMO_MODE environment variable
+	@if [ "$(DEMO_MODE)" != "true" ]; then \
+		echo "$(YELLOW)ERROR: DEMO_MODE environment variable is not set to 'true'$(NC)"; \
+		echo "$(YELLOW)This command is only allowed in demo environments.$(NC)"; \
+		echo "$(YELLOW)Set DEMO_MODE=true to proceed.$(NC)"; \
+		exit 1; \
+	fi
+
+demo-init: demo-check ## Initialize Snaplet config and extract enums
+	@echo "$(BLUE)Initializing Snaplet configuration...$(NC)"
+	docker compose exec backend python manage.py extract_enums --output /app/../snaplet/.snaplet/enums.json
+	docker compose exec snaplet sh -c "cd /app && npm install"
+	@echo "$(GREEN)✓ Snaplet configuration initialized$(NC)"
+
+demo-clear: demo-check ## Clear all demo data (WARNING: deletes all data)
+	@echo "$(YELLOW)⚠ This will delete all demo data!$(NC)"
+	@read -p "Are you sure? [y/N] " -n 1 -r; \
+	echo; \
+	if [[ $$REPLY =~ ^[Yy]$$ ]]; then \
+		echo "$(BLUE)Clearing demo data...$(NC)"; \
+		docker compose exec backend python manage.py shell -c " \
+			from training.models import WorkoutSet, WorkoutExercise, Workout, UserTrainingPreferences; \
+			from account.models import User; \
+			from gym.models import GymEquipment; \
+			from catalog.models import Exercise, Equipment; \
+			from gym.models import Gym; \
+			WorkoutSet.objects.all().delete(); \
+			WorkoutExercise.objects.all().delete(); \
+			Workout.objects.all().delete(); \
+			UserTrainingPreferences.objects.all().delete(); \
+			User.objects.filter(is_staff=False).delete(); \
+			GymEquipment.objects.all().delete(); \
+			Exercise.objects.all().delete(); \
+			Equipment.objects.all().delete(); \
+			Gym.objects.all().delete(); \
+			print('Demo data cleared'); \
+		"; \
+		echo "$(GREEN)✓ Demo data cleared$(NC)"; \
+	fi
+
+demo-load: demo-check ## Generate fresh demo data using Snaplet
+	@echo "$(BLUE)Generating demo data with Snaplet...$(NC)"
+	@if [ ! -f snaplet/.snaplet/enums.json ]; then \
+		echo "$(YELLOW)Enums file not found. Running demo-init first...$(NC)"; \
+		$(MAKE) demo-init; \
+	fi
+	docker compose exec -e DEMO_MODE=true snaplet npm run seed
+	@echo "$(GREEN)✓ Demo data generated$(NC)"
+
+demo-reset: demo-check ## Clear and reload demo data
+	@echo "$(BLUE)Resetting demo data...$(NC)"
+	$(MAKE) demo-clear DEMO_MODE=true
+	$(MAKE) demo-load DEMO_MODE=true
+	@echo "$(GREEN)✓ Demo data reset complete$(NC)"

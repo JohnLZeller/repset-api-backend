@@ -64,6 +64,21 @@ services:
     environment:
       ADMINER_DEFAULT_SERVER: db
 
+  snaplet:
+    image: node:20-alpine
+    volumes:
+      - ./snaplet:/app
+      - ./backend:/backend
+    working_dir: /app
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-repset}:${POSTGRES_PASSWORD:-repset}@db:5432/${POSTGRES_DB:-repset}
+      DEMO_MODE: ${DEMO_MODE:-false}
+    depends_on:
+      db:
+        condition: service_healthy
+      backend:
+        condition: service_started
+
 volumes:
   postgres_data:
   backend_static:
