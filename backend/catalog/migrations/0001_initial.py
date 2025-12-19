@@ -8,32 +8,165 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Equipment',
+            name="Equipment",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('brand', models.CharField(max_length=255)),
-                ('modality', models.CharField(choices=[('free_weights', 'Free Weights'), ('machines', 'Machines'), ('cables', 'Cables'), ('bodyweight', 'Bodyweight'), ('bands_suspension', 'Bands / Suspension')], max_length=50)),
-                ('station', models.CharField(blank=True, choices=[('rack', 'Rack'), ('bench', 'Bench'), ('pull_up_bar', 'Pull-up Bar'), ('dip_station', 'Dip Station'), ('floor', 'Floor')], max_length=50, null=True)),
-                ('equipment_type', models.CharField(choices=[('selectorized', 'Selectorized'), ('plate_loaded', 'Plate Loaded'), ('smith', 'Smith Machine')], max_length=50)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("brand", models.CharField(max_length=255)),
+                (
+                    "modality",
+                    models.CharField(
+                        choices=[
+                            ("free_weights", "Free Weights"),
+                            ("machines", "Machines"),
+                            ("cables", "Cables"),
+                            ("bodyweight", "Bodyweight"),
+                            ("bands_suspension", "Bands / Suspension"),
+                        ],
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "station",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("rack", "Rack"),
+                            ("bench", "Bench"),
+                            ("pull_up_bar", "Pull-up Bar"),
+                            ("dip_station", "Dip Station"),
+                            ("floor", "Floor"),
+                        ],
+                        max_length=50,
+                        null=True,
+                    ),
+                ),
+                (
+                    "equipment_type",
+                    models.CharField(
+                        choices=[
+                            ("selectorized", "Selectorized"),
+                            ("plate_loaded", "Plate Loaded"),
+                            ("smith", "Smith Machine"),
+                        ],
+                        max_length=50,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
             ],
         ),
         migrations.CreateModel(
-            name='Exercise',
+            name="Exercise",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('description', models.TextField(blank=True)),
-                ('primary_muscles', django.contrib.postgres.fields.ArrayField(base_field=models.CharField(choices=[('chest', 'Chest'), ('front_delts', 'Front Delts'), ('side_delts', 'Side Delts'), ('triceps', 'Triceps'), ('lats', 'Lats'), ('upper_back', 'Upper Back'), ('rear_delts', 'Rear Delts'), ('biceps', 'Biceps'), ('forearms', 'Forearms'), ('abs', 'Abs'), ('obliques', 'Obliques'), ('lower_back', 'Lower Back'), ('quads', 'Quads'), ('hamstrings', 'Hamstrings'), ('glutes', 'Glutes'), ('calves', 'Calves'), ('hip_flexors', 'Hip Flexors'), ('adductors', 'Adductors'), ('abductors', 'Abductors')], max_length=50), default=list)),
-                ('secondary_muscles', django.contrib.postgres.fields.ArrayField(base_field=models.CharField(choices=[('chest', 'Chest'), ('front_delts', 'Front Delts'), ('side_delts', 'Side Delts'), ('triceps', 'Triceps'), ('lats', 'Lats'), ('upper_back', 'Upper Back'), ('rear_delts', 'Rear Delts'), ('biceps', 'Biceps'), ('forearms', 'Forearms'), ('abs', 'Abs'), ('obliques', 'Obliques'), ('lower_back', 'Lower Back'), ('quads', 'Quads'), ('hamstrings', 'Hamstrings'), ('glutes', 'Glutes'), ('calves', 'Calves'), ('hip_flexors', 'Hip Flexors'), ('adductors', 'Adductors'), ('abductors', 'Abductors')], max_length=50), default=list)),
-                ('attributes', django.contrib.postgres.fields.ArrayField(base_field=models.CharField(choices=[('high_impact', 'High Impact'), ('overhead', 'Overhead'), ('spotter_advised', 'Spotter Advised'), ('technically_complex', 'Technically Complex'), ('floor_required', 'Floor Required'), ('high_joint_stress', 'High Joint Stress')], max_length=50), blank=True, default=list, null=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("description", models.TextField(blank=True)),
+                (
+                    "primary_muscles",
+                    django.contrib.postgres.fields.ArrayField(
+                        base_field=models.CharField(
+                            choices=[
+                                ("chest", "Chest"),
+                                ("front_delts", "Front Delts"),
+                                ("side_delts", "Side Delts"),
+                                ("triceps", "Triceps"),
+                                ("lats", "Lats"),
+                                ("upper_back", "Upper Back"),
+                                ("rear_delts", "Rear Delts"),
+                                ("biceps", "Biceps"),
+                                ("forearms", "Forearms"),
+                                ("grip", "Grip"),
+                                ("abs", "Abs"),
+                                ("obliques", "Obliques"),
+                                ("lower_back", "Lower Back"),
+                                ("quads", "Quads"),
+                                ("hamstrings", "Hamstrings"),
+                                ("glutes", "Glutes"),
+                                ("calves", "Calves"),
+                                ("shins", "Shins"),
+                                ("feet", "Feet"),
+                                ("hip_flexors", "Hip Flexors"),
+                                ("adductors", "Adductors"),
+                                ("abductors", "Abductors"),
+                            ],
+                            max_length=50,
+                        ),
+                        default=list,
+                    ),
+                ),
+                (
+                    "secondary_muscles",
+                    django.contrib.postgres.fields.ArrayField(
+                        base_field=models.CharField(
+                            choices=[
+                                ("chest", "Chest"),
+                                ("front_delts", "Front Delts"),
+                                ("side_delts", "Side Delts"),
+                                ("triceps", "Triceps"),
+                                ("lats", "Lats"),
+                                ("upper_back", "Upper Back"),
+                                ("rear_delts", "Rear Delts"),
+                                ("biceps", "Biceps"),
+                                ("forearms", "Forearms"),
+                                ("grip", "Grip"),
+                                ("abs", "Abs"),
+                                ("obliques", "Obliques"),
+                                ("lower_back", "Lower Back"),
+                                ("quads", "Quads"),
+                                ("hamstrings", "Hamstrings"),
+                                ("glutes", "Glutes"),
+                                ("calves", "Calves"),
+                                ("shins", "Shins"),
+                                ("feet", "Feet"),
+                                ("hip_flexors", "Hip Flexors"),
+                                ("adductors", "Adductors"),
+                                ("abductors", "Abductors"),
+                            ],
+                            max_length=50,
+                        ),
+                        default=list,
+                    ),
+                ),
+                (
+                    "attributes",
+                    django.contrib.postgres.fields.ArrayField(
+                        base_field=models.CharField(
+                            choices=[
+                                ("high_impact", "High Impact"),
+                                ("overhead", "Overhead"),
+                                ("spotter_advised", "Spotter Advised"),
+                                ("technically_complex", "Technically Complex"),
+                                ("floor_required", "Floor Required"),
+                                ("high_joint_stress", "High Joint Stress"),
+                            ],
+                            max_length=50,
+                        ),
+                        blank=True,
+                        default=list,
+                        null=True,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
             ],
         ),
     ]

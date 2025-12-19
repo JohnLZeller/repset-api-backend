@@ -64,13 +64,12 @@ class WorkoutAdmin(admin.ModelAdmin):
     list_display = [
         "user",
         "workout_number",
-        "focus",
         "status",
         "started_at",
         "completed_at",
         "created_at",
     ]
-    list_filter = ["focus", "status", "created_at"]
+    list_filter = ["status", "created_at"]
     search_fields = ["user__email", "user__full_name"]
     readonly_fields = ["created_at", "updated_at"]
     raw_id_fields = ["user"]
