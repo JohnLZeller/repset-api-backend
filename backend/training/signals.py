@@ -20,3 +20,4 @@ def create_user_training_preferences(
     if created:
         UserTrainingPreferences.objects.create(user=instance)
 
+

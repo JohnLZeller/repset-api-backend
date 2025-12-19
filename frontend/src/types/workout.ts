@@ -33,3 +33,4 @@ export interface Workout {
   status: 'scheduled' | 'in_progress' | 'completed';
 }
 
+

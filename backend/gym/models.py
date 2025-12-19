@@ -20,19 +20,21 @@ class Gym(models.Model):
         return self.name
 
 
-class GymMachine(models.Model):
-    """A specific machine instance at a gym."""
+class GymEquipment(models.Model):
+    """A specific equipment instance at a gym."""
 
-    gym = models.ForeignKey(Gym, on_delete=models.CASCADE, related_name="machines")
-    master_machine = models.ForeignKey(
-        "catalog.Machine",
+    gym = models.ForeignKey(Gym, on_delete=models.CASCADE, related_name="equipment")
+    equipment = models.ForeignKey(
+        "catalog.Equipment",
         on_delete=models.CASCADE,
         related_name="gym_instances",
     )
-    machine_number = models.CharField(max_length=50)  # Gym-specific identifier
+    equipment_display_number = models.CharField(
+        max_length=50
+    )  # Gym-specific identifier
 
     class Meta:
-        unique_together = ["gym", "machine_number"]
+        unique_together = ["gym", "equipment_display_number"]
 
     def __str__(self) -> str:
-        return f"{self.gym.name} - #{self.machine_number} ({self.master_machine.name})"
+        return f"{self.gym.name} - #{self.equipment_display_number} ({self.equipment.name})"

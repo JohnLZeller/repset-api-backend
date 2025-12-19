@@ -6,3 +6,4 @@ urlpatterns = [
     path("preferences/training/", TrainingPreferencesView.as_view(), name="training_preferences"),
 ]
 
+

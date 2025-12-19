@@ -14,7 +14,7 @@ repset-api-backend/
 │   ├── requirements.txt
 │   ├── core/             # Django project settings
 │   ├── account/          # User authentication app
-│   ├── catalog/          # Master catalog (Exercise, Machine)
+│   ├── catalog/          # Master catalog (Exercise, Equipment)
 │   ├── gym/              # Gym locations and machine inventory
 │   ├── training/         # Workout tracking and preferences
 │   └── docs/             # API documentation
@@ -167,21 +167,21 @@ The backend is organized into four main Django apps:
    - `User` - Custom user model with email authentication
    - Users belong to exactly one `Gym`
 
-2. **catalog** - Master catalog of exercises and machines
+2. **catalog** - Master catalog of exercises and equipment
 
    - `Exercise` - Master catalog of exercises with primary/secondary muscles
-   - `Machine` - Master catalog of machine types (brand, equipment type)
+   - `Equipment` - Master catalog of equipment (brand, equipment type)
    - `MuscleGroup` enum - 17 muscle groups (chest, lats, quads, etc.)
 
-3. **gym** - Gym locations and machine inventory
+3. **gym** - Gym locations and equipment inventory
 
    - `Gym` - Physical gym locations with full address fields
-   - `GymMachine` - Links a `Machine` to a `Gym` with a local machine number
+   - `GymEquipment` - Links an `Equipment` to a `Gym` with a local equipment display number
 
 4. **training** - Workout tracking and user preferences
    - `UserTrainingPreferences` - User's equipment exclusions and training schedule
    - `Workout` - User's workout sessions with focus and status
-   - `WorkoutExercise` - Links exercise + gym machine to a workout
+   - `WorkoutExercise` - Links exercise + gym equipment to a workout
    - `WorkoutSet` - Individual sets with target and actual weight/reps
    - `WorkoutFocus` enum - 11 workout focus types (chest, back, legs, push, pull, etc.)
    - `WorkoutStatus` enum - Workout states (scheduled, in_progress, completed)
@@ -190,12 +190,12 @@ The backend is organized into four main Django apps:
 
 ```
 User → Gym (many-to-one)
-Gym → GymMachine (one-to-many)
-Machine → GymMachine (one-to-many)
+Gym → GymEquipment (one-to-many)
+Equipment → GymEquipment (one-to-many)
 User → Workout (one-to-many)
 Workout → WorkoutExercise (one-to-many)
 WorkoutExercise → Exercise (many-to-one)
-WorkoutExercise → GymMachine (many-to-one)
+WorkoutExercise → GymEquipment (many-to-one)
 WorkoutExercise → WorkoutSet (one-to-many)
 ```
 

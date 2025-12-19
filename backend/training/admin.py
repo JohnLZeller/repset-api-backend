@@ -35,7 +35,7 @@ class UserTrainingPreferencesAdmin(admin.ModelAdmin):
                 "fields": (
                     "excluded_equipment_modalities",
                     "excluded_equipment_stations",
-                    "excluded_machine_types",
+                    "excluded_equipment_types",
                     "excluded_exercise_attributes",
                 ),
             },
@@ -80,10 +80,14 @@ class WorkoutAdmin(admin.ModelAdmin):
 class WorkoutExerciseAdmin(admin.ModelAdmin):
     """Admin interface for WorkoutExercise model."""
 
-    list_display = ["workout", "exercise", "gym_machine", "order"]
-    list_filter = ["exercise", "gym_machine__gym"]
-    search_fields = ["workout__user__email", "exercise__name", "gym_machine__machine_number"]
-    raw_id_fields = ["workout", "exercise", "gym_machine"]
+    list_display = ["workout", "exercise", "gym_equipment", "order"]
+    list_filter = ["exercise", "gym_equipment__gym"]
+    search_fields = [
+        "workout__user__email",
+        "exercise__name",
+        "gym_equipment__equipment_display_number",
+    ]
+    raw_id_fields = ["workout", "exercise", "gym_equipment"]
 
 
 @admin.register(WorkoutSet)

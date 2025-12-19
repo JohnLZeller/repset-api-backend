@@ -23,8 +23,8 @@ class EquipmentStation(models.TextChoices):
     FLOOR = "floor", "Floor"
 
 
-class MachineType(models.TextChoices):
-    """Machine loading style."""
+class EquipmentType(models.TextChoices):
+    """Equipment loading style."""
 
     SELECTORIZED = "selectorized", "Selectorized"
     PLATE_LOADED = "plate_loaded", "Plate Loaded"
@@ -58,4 +58,3 @@ class WorkoutStatus(models.TextChoices):
     SCHEDULED = "scheduled", "Scheduled"
     IN_PROGRESS = "in_progress", "In Progress"
     COMPLETED = "completed", "Completed"
-

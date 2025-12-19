@@ -7,8 +7,8 @@ from django.db import models
 from training.enums import (
     EquipmentModality,
     EquipmentStation,
+    EquipmentType,
     ExerciseAttribute,
-    MachineType,
     WorkoutFocus,
     WorkoutStatus,
 )
@@ -37,8 +37,8 @@ class UserTrainingPreferences(models.Model):
         blank=True,
     )
 
-    excluded_machine_types = ArrayField(
-        models.CharField(max_length=50, choices=MachineType.choices),
+    excluded_equipment_types = ArrayField(
+        models.CharField(max_length=50, choices=EquipmentType.choices),
         default=list,
         blank=True,
     )
@@ -85,12 +85,14 @@ class Workout(models.Model):
 
 
 class WorkoutExercise(models.Model):
-    """An exercise within a workout, linked to a specific gym machine."""
+    """An exercise within a workout, linked to a specific gym equipment."""
 
-    workout = models.ForeignKey(Workout, on_delete=models.CASCADE, related_name="exercises")
+    workout = models.ForeignKey(
+        Workout, on_delete=models.CASCADE, related_name="exercises"
+    )
     exercise = models.ForeignKey("catalog.Exercise", on_delete=models.PROTECT)
-    gym_machine = models.ForeignKey(
-        "gym.GymMachine",
+    gym_equipment = models.ForeignKey(
+        "gym.GymEquipment",
         on_delete=models.PROTECT,
         related_name="workout_exercises",
     )
@@ -132,4 +134,3 @@ class WorkoutSet(models.Model):
 
     def __str__(self) -> str:
         return f"{self.workout_exercise} - Set {self.set_number}"
-

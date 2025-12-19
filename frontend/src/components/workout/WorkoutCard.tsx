@@ -155,3 +155,4 @@ const WorkoutCard = ({ workout, variant = 'history' }: WorkoutCardProps) => {
 
 export default WorkoutCard;
 
+

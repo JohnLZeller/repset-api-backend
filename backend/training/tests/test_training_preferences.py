@@ -18,8 +18,8 @@ from rest_framework.test import APIClient
 from training.enums import (
     EquipmentModality,
     EquipmentStation,
+    EquipmentType,
     ExerciseAttribute,
-    MachineType,
 )
 from training.models import UserTrainingPreferences
 
@@ -64,9 +64,9 @@ class TrainingPreferencesAPITestCase(TestCase):
         # Set cookies on client
         from django.conf import settings
 
-        self.client.cookies[settings.JWT_ACCESS_COOKIE_NAME] = (
-            login_response.cookies[settings.JWT_ACCESS_COOKIE_NAME].value
-        )
+        self.client.cookies[settings.JWT_ACCESS_COOKIE_NAME] = login_response.cookies[
+            settings.JWT_ACCESS_COOKIE_NAME
+        ].value
 
 
 class AutoCreationTests(TrainingPreferencesAPITestCase):
@@ -75,16 +75,14 @@ class AutoCreationTests(TrainingPreferencesAPITestCase):
     def test_preferences_created_on_user_creation(self) -> None:
         """Test that preferences are created when a user is created."""
         user = self.create_test_user()
-        self.assertTrue(
-            UserTrainingPreferences.objects.filter(user=user).exists()
-        )
+        self.assertTrue(UserTrainingPreferences.objects.filter(user=user).exists())
         preferences = UserTrainingPreferences.objects.get(user=user)
         self.assertEqual(preferences.sessions_per_week, 3)
         self.assertEqual(preferences.training_intensity, 5)
         self.assertEqual(preferences.max_session_mins, 60)
         self.assertEqual(preferences.excluded_equipment_modalities, [])
         self.assertEqual(preferences.excluded_equipment_stations, [])
-        self.assertEqual(preferences.excluded_machine_types, [])
+        self.assertEqual(preferences.excluded_equipment_types, [])
         self.assertEqual(preferences.excluded_exercise_attributes, [])
 
 
@@ -104,7 +102,7 @@ class GETTests(TrainingPreferencesAPITestCase):
         self.assertEqual(response.data["max_session_mins"], 60)
         self.assertEqual(response.data["excluded_equipment_modalities"], [])
         self.assertEqual(response.data["excluded_equipment_stations"], [])
-        self.assertEqual(response.data["excluded_machine_types"], [])
+        self.assertEqual(response.data["excluded_equipment_types"], [])
         self.assertEqual(response.data["excluded_exercise_attributes"], [])
         self.assertIn("updated_at", response.data)
 
@@ -118,9 +116,7 @@ class GETTests(TrainingPreferencesAPITestCase):
         response = self.client.get(self.preferences_url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(
-            UserTrainingPreferences.objects.filter(user=user).exists()
-        )
+        self.assertTrue(UserTrainingPreferences.objects.filter(user=user).exists())
 
     def test_get_requires_authentication(self) -> None:
         """Test GET endpoint requires authentication."""
@@ -142,7 +138,7 @@ class PUTTests(TrainingPreferencesAPITestCase):
                 EquipmentModality.MACHINES,
             ],
             "excluded_equipment_stations": [EquipmentStation.RACK],
-            "excluded_machine_types": [MachineType.SELECTORIZED],
+            "excluded_equipment_types": [EquipmentType.SELECTORIZED],
             "excluded_exercise_attributes": [
                 ExerciseAttribute.HIGH_IMPACT,
                 ExerciseAttribute.SPOTTER_ADVISED,
@@ -164,8 +160,8 @@ class PUTTests(TrainingPreferencesAPITestCase):
             {EquipmentStation.RACK},
         )
         self.assertEqual(
-            set(response.data["excluded_machine_types"]),
-            {MachineType.SELECTORIZED},
+            set(response.data["excluded_equipment_types"]),
+            {EquipmentType.SELECTORIZED},
         )
         self.assertEqual(
             set(response.data["excluded_exercise_attributes"]),
@@ -189,8 +185,8 @@ class PUTTests(TrainingPreferencesAPITestCase):
             {EquipmentStation.RACK},
         )
         self.assertEqual(
-            set(preferences.excluded_machine_types),
-            {MachineType.SELECTORIZED},
+            set(preferences.excluded_equipment_types),
+            {EquipmentType.SELECTORIZED},
         )
         self.assertEqual(preferences.sessions_per_week, 5)
         self.assertEqual(preferences.training_intensity, 8)
@@ -279,13 +275,13 @@ class ValidationTests(TrainingPreferencesAPITestCase):
         response = self.client.put(self.preferences_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_validate_excluded_machine_types_choices(self) -> None:
-        """Test excluded_machine_types must contain valid choices."""
-        data = {"excluded_machine_types": ["invalid_type"]}
+    def test_validate_excluded_equipment_types_choices(self) -> None:
+        """Test excluded_equipment_types must contain valid choices."""
+        data = {"excluded_equipment_types": ["invalid_type"]}
         response = self.client.put(self.preferences_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-        data = {"excluded_machine_types": [MachineType.SELECTORIZED]}
+        data = {"excluded_equipment_types": [EquipmentType.SELECTORIZED]}
         response = self.client.put(self.preferences_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -295,9 +291,7 @@ class ValidationTests(TrainingPreferencesAPITestCase):
         response = self.client.put(self.preferences_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-        data = {
-            "excluded_exercise_attributes": [ExerciseAttribute.HIGH_IMPACT]
-        }
+        data = {"excluded_exercise_attributes": [ExerciseAttribute.HIGH_IMPACT]}
         response = self.client.put(self.preferences_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -321,9 +315,9 @@ class UserIsolationTests(TrainingPreferencesAPITestCase):
         login_response = self.client.post("/api/auth/login/", login_data, format="json")
         from django.conf import settings
 
-        self.client.cookies[settings.JWT_ACCESS_COOKIE_NAME] = (
-            login_response.cookies[settings.JWT_ACCESS_COOKIE_NAME].value
-        )
+        self.client.cookies[settings.JWT_ACCESS_COOKIE_NAME] = login_response.cookies[
+            settings.JWT_ACCESS_COOKIE_NAME
+        ].value
 
         # Get preferences - should return user1's preferences
         response = self.client.get(self.preferences_url)
@@ -341,4 +335,3 @@ class UserIsolationTests(TrainingPreferencesAPITestCase):
         # Verify user2's preferences were not affected
         prefs2 = UserTrainingPreferences.objects.get(user=user2)
         self.assertEqual(prefs2.sessions_per_week, 3)  # default
-

@@ -9,3 +9,4 @@ class TrainingConfig(AppConfig):
         """Import signals when the app is ready."""
         import training.signals  # noqa: F401
 
+

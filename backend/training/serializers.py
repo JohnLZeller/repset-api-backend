@@ -5,8 +5,8 @@ from rest_framework import serializers
 from training.enums import (
     EquipmentModality,
     EquipmentStation,
+    EquipmentType,
     ExerciseAttribute,
-    MachineType,
 )
 from training.models import UserTrainingPreferences
 
@@ -21,7 +21,7 @@ class TrainingPreferencesSerializer(serializers.ModelSerializer):
         fields = [
             "excluded_equipment_modalities",
             "excluded_equipment_stations",
-            "excluded_machine_types",
+            "excluded_equipment_types",
             "excluded_exercise_attributes",
             "sessions_per_week",
             "training_intensity",
@@ -53,9 +53,7 @@ class TrainingPreferencesSerializer(serializers.ModelSerializer):
             )
         return value
 
-    def validate_excluded_equipment_modalities(
-        self, value: list[str]
-    ) -> list[str]:
+    def validate_excluded_equipment_modalities(self, value: list[str]) -> list[str]:
         """Validate excluded_equipment_modalities contains valid choices."""
         valid_choices = {choice[0] for choice in EquipmentModality.choices}
         for item in value:
@@ -65,9 +63,7 @@ class TrainingPreferencesSerializer(serializers.ModelSerializer):
                 )
         return value
 
-    def validate_excluded_equipment_stations(
-        self, value: list[str]
-    ) -> list[str]:
+    def validate_excluded_equipment_stations(self, value: list[str]) -> list[str]:
         """Validate excluded_equipment_stations contains valid choices."""
         valid_choices = {choice[0] for choice in EquipmentStation.choices}
         for item in value:
@@ -77,19 +73,17 @@ class TrainingPreferencesSerializer(serializers.ModelSerializer):
                 )
         return value
 
-    def validate_excluded_machine_types(self, value: list[str]) -> list[str]:
-        """Validate excluded_machine_types contains valid choices."""
-        valid_choices = {choice[0] for choice in MachineType.choices}
+    def validate_excluded_equipment_types(self, value: list[str]) -> list[str]:
+        """Validate excluded_equipment_types contains valid choices."""
+        valid_choices = {choice[0] for choice in EquipmentType.choices}
         for item in value:
             if item not in valid_choices:
                 raise serializers.ValidationError(
-                    f"'{item}' is not a valid machine type."
+                    f"'{item}' is not a valid equipment type."
                 )
         return value
 
-    def validate_excluded_exercise_attributes(
-        self, value: list[str]
-    ) -> list[str]:
+    def validate_excluded_exercise_attributes(self, value: list[str]) -> list[str]:
         """Validate excluded_exercise_attributes contains valid choices."""
         valid_choices = {choice[0] for choice in ExerciseAttribute.choices}
         for item in value:
@@ -98,4 +92,3 @@ class TrainingPreferencesSerializer(serializers.ModelSerializer):
                     f"'{item}' is not a valid exercise attribute."
                 )
         return value
-

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from gym.models import Gym, GymMachine
+from gym.models import Gym, GymEquipment
 
 
 @admin.register(Gym)
@@ -13,11 +13,11 @@ class GymAdmin(admin.ModelAdmin):
     readonly_fields = ["created_at", "updated_at"]
 
 
-@admin.register(GymMachine)
-class GymMachineAdmin(admin.ModelAdmin):
-    """Admin interface for GymMachine model."""
+@admin.register(GymEquipment)
+class GymEquipmentAdmin(admin.ModelAdmin):
+    """Admin interface for GymEquipment model."""
 
-    list_display = ["gym", "master_machine", "machine_number"]
-    list_filter = ["gym", "master_machine__brand", "master_machine__equipment_type"]
-    search_fields = ["gym__name", "master_machine__name", "machine_number"]
-    raw_id_fields = ["gym", "master_machine"]
+    list_display = ["gym", "equipment", "equipment_display_number"]
+    list_filter = ["gym", "equipment__brand", "equipment__equipment_type"]
+    search_fields = ["gym__name", "equipment__name", "equipment_display_number"]
+    raw_id_fields = ["gym", "equipment"]
