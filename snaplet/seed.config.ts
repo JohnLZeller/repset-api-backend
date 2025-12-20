@@ -1,4 +1,6 @@
-import { defineConfig } from "@snaplet/seed";
+import { SeedPostgres } from "@snaplet/seed/adapter-postgres";
+import { defineConfig } from "@snaplet/seed/config";
+import postgres from "postgres";
 import enumsData from "./.snaplet/enums.json";
 
 /**
@@ -88,7 +90,14 @@ function buildEnumOverrides() {
 }
 
 export default defineConfig({
-  adapter: "postgres",
+  adapter: () => {
+    const databaseUrl = process.env.DATABASE_URL;
+    if (!databaseUrl) {
+      throw new Error("DATABASE_URL environment variable is not set");
+    }
+    const client = postgres(databaseUrl);
+    return new SeedPostgres(client);
+  },
   // Column overrides for enum fields
   // These ensure generated data respects Django enum constraints
   overrides: buildEnumOverrides(),

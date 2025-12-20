@@ -189,8 +189,8 @@ demo-check: ## Internal: Check DEMO_MODE environment variable
 
 demo-init: demo-check ## Initialize Snaplet config and extract enums
 	@echo "$(BLUE)Initializing Snaplet configuration...$(NC)"
-	docker compose exec backend python manage.py extract_enums --output /app/../snaplet/.snaplet/enums.json
-	docker compose exec snaplet sh -c "cd /app && npm install"
+	docker compose exec backend python manage.py extract_enums --output /snaplet/.snaplet/enums.json
+	docker compose run --rm snaplet sh -c "cd /app && npm install && npx @snaplet/seed init --adapter postgres && npm run sync"
 	@echo "$(GREEN)✓ Snaplet configuration initialized$(NC)"
 
 demo-clear: demo-check ## Clear all demo data (WARNING: deletes all data)
@@ -223,9 +223,9 @@ demo-load: demo-check ## Generate fresh demo data using Snaplet
 	@echo "$(BLUE)Generating demo data with Snaplet...$(NC)"
 	@if [ ! -f snaplet/.snaplet/enums.json ]; then \
 		echo "$(YELLOW)Enums file not found. Running demo-init first...$(NC)"; \
-		$(MAKE) demo-init; \
+		$(MAKE) demo-init DEMO_MODE=true; \
 	fi
-	docker compose exec -e DEMO_MODE=true snaplet npm run seed
+	docker compose run --rm -e DEMO_MODE=true snaplet npm run seed
 	@echo "$(GREEN)✓ Demo data generated$(NC)"
 
 demo-reset: demo-check ## Clear and reload demo data

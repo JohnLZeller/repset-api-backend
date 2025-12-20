@@ -26,6 +26,7 @@ services:
         SECRET_KEY: ${SECRET_KEY:-build-time-dummy-key}
     volumes:
       - ./backend:/app
+      - ./snaplet:/snaplet
       - backend_static:/app/staticfiles
     ports:
       - "8000:8000"

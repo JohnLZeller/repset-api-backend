@@ -4,10 +4,13 @@
   "description": "Snaplet Seed configuration for generating demo data",
   "type": "module",
   "scripts": {
-    "seed": "tsx seed.ts"
+    "seed": "tsx seed.ts",
+    "sync": "npx @snaplet/seed sync"
   },
   "dependencies": {
-    "@snaplet/seed": "^0.1.0"
+    "@snaplet/seed": "^0.98.0",
+    "@snaplet/copycat": "^5.0.0",
+    "postgres": "^3.4.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

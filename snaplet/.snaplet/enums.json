@@ -1,0 +1,203 @@
+{
+  "discovered_fields": [
+    "account_usertrainingpreferences.excluded_equipment_modalities",
+    "account_usertrainingpreferences.excluded_equipment_stations",
+    "account_usertrainingpreferences.excluded_equipment_types",
+    "account_usertrainingpreferences.excluded_exercise_attributes",
+    "catalog_equipment.equipment_type",
+    "catalog_equipment.modality",
+    "catalog_equipment.station",
+    "catalog_exercise.attributes",
+    "catalog_exercise.primary_muscles",
+    "catalog_exercise.secondary_muscles",
+    "django_admin_log.action_flag",
+    "training_workout.status"
+  ],
+  "enums": {
+    "account_usertrainingpreferences.excluded_equipment_modalities": {
+      "field": "excluded_equipment_modalities",
+      "model": "training.usertrainingpreferences",
+      "nullable": false,
+      "type": "array",
+      "values": [
+        "bands_suspension",
+        "bodyweight",
+        "cables",
+        "free_weights",
+        "machines"
+      ]
+    },
+    "account_usertrainingpreferences.excluded_equipment_stations": {
+      "field": "excluded_equipment_stations",
+      "model": "training.usertrainingpreferences",
+      "nullable": false,
+      "type": "array",
+      "values": [
+        "bench",
+        "dip_station",
+        "floor",
+        "pull_up_bar",
+        "rack"
+      ]
+    },
+    "account_usertrainingpreferences.excluded_equipment_types": {
+      "field": "excluded_equipment_types",
+      "model": "training.usertrainingpreferences",
+      "nullable": false,
+      "type": "array",
+      "values": [
+        "plate_loaded",
+        "selectorized",
+        "smith"
+      ]
+    },
+    "account_usertrainingpreferences.excluded_exercise_attributes": {
+      "field": "excluded_exercise_attributes",
+      "model": "training.usertrainingpreferences",
+      "nullable": false,
+      "type": "array",
+      "values": [
+        "floor_required",
+        "high_impact",
+        "high_joint_stress",
+        "overhead",
+        "spotter_advised",
+        "technically_complex"
+      ]
+    },
+    "catalog_equipment.equipment_type": {
+      "field": "equipment_type",
+      "model": "catalog.equipment",
+      "nullable": false,
+      "type": "scalar",
+      "values": [
+        "plate_loaded",
+        "selectorized",
+        "smith"
+      ]
+    },
+    "catalog_equipment.modality": {
+      "field": "modality",
+      "model": "catalog.equipment",
+      "nullable": false,
+      "type": "scalar",
+      "values": [
+        "bands_suspension",
+        "bodyweight",
+        "cables",
+        "free_weights",
+        "machines"
+      ]
+    },
+    "catalog_equipment.station": {
+      "field": "station",
+      "model": "catalog.equipment",
+      "nullable": true,
+      "type": "scalar",
+      "values": [
+        "bench",
+        "dip_station",
+        "floor",
+        "pull_up_bar",
+        "rack"
+      ]
+    },
+    "catalog_exercise.attributes": {
+      "field": "attributes",
+      "model": "catalog.exercise",
+      "nullable": true,
+      "type": "array",
+      "values": [
+        "floor_required",
+        "high_impact",
+        "high_joint_stress",
+        "overhead",
+        "spotter_advised",
+        "technically_complex"
+      ]
+    },
+    "catalog_exercise.primary_muscles": {
+      "field": "primary_muscles",
+      "model": "catalog.exercise",
+      "nullable": false,
+      "type": "array",
+      "values": [
+        "abductors",
+        "abs",
+        "adductors",
+        "biceps",
+        "calves",
+        "chest",
+        "feet",
+        "forearms",
+        "front_delts",
+        "glutes",
+        "grip",
+        "hamstrings",
+        "hip_flexors",
+        "lats",
+        "lower_back",
+        "obliques",
+        "quads",
+        "rear_delts",
+        "shins",
+        "side_delts",
+        "triceps",
+        "upper_back"
+      ]
+    },
+    "catalog_exercise.secondary_muscles": {
+      "field": "secondary_muscles",
+      "model": "catalog.exercise",
+      "nullable": false,
+      "type": "array",
+      "values": [
+        "abductors",
+        "abs",
+        "adductors",
+        "biceps",
+        "calves",
+        "chest",
+        "feet",
+        "forearms",
+        "front_delts",
+        "glutes",
+        "grip",
+        "hamstrings",
+        "hip_flexors",
+        "lats",
+        "lower_back",
+        "obliques",
+        "quads",
+        "rear_delts",
+        "shins",
+        "side_delts",
+        "triceps",
+        "upper_back"
+      ]
+    },
+    "django_admin_log.action_flag": {
+      "field": "action_flag",
+      "model": "admin.logentry",
+      "nullable": false,
+      "type": "scalar",
+      "values": [
+        "1",
+        "2",
+        "3"
+      ]
+    },
+    "training_workout.status": {
+      "field": "status",
+      "model": "training.workout",
+      "nullable": false,
+      "type": "scalar",
+      "values": [
+        "completed",
+        "in_progress",
+        "scheduled"
+      ]
+    }
+  },
+  "total_fields": 12
+}
